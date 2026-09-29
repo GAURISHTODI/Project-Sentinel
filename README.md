@@ -12,14 +12,43 @@ Sentinel ingests logs from four sources, detects attacks with ATT&CK-mapped rule
 
 | | |
 |---|---|
-| **Ingestion** | 4 log sources (app, auth, network/Zeek, Windows endpoint) through Kafka at 1,000 events/sec (60,000 events per run) |
-| **Detection** | 12 Sigma-style rules mapped to 8 MITRE ATT&CK techniques, plus 6 ML models |
-| **Network IDS accuracy** | F1 = 0.97, false-positive rate 0.8% (CIC-IDS2017) |
-| **Response** | 5 automated actions enforced by a Spring Boot gateway with JWT/RBAC |
-| **Speed** | < 300 ms block latency, < 2 s mean time to detect |
-| **Vulnerability assessment** | 9 OWASP findings in the vulnerable target, 0 after fixes |
-| **LLM safety** | 15+ prompt-injection strings, 100% on-schema |
-| **DevSecOps** | 6 scanners in CI, 60+ automated tests |
+| **Ingestion** | 4 log sources (app, auth, network/Zeek, Windows endpoint) through Kafka, throughput TBD |
+| **Detection** | 12 planned Sigma-style rules mapped to MITRE ATT&CK, plus 6 planned ML models (built so far: see status) |
+| **Network IDS accuracy** | TBD (CIC-IDS2017) |
+| **Response** | 5 planned automated actions enforced by a Spring Boot gateway with JWT/RBAC |
+| **Speed** | Block latency TBD, mean time to detect TBD |
+| **Vulnerability assessment** | Findings TBD |
+| **LLM safety** | Injection suite pass rate TBD |
+| **DevSecOps** | Scanners in CI TBD, test count TBD |
+
+## Status
+
+A feature is ticked only when its code, tests and a working demo exist.
+
+- [x] T1 Scaffold + infra (Kafka KRaft, Redis, PostgreSQL, compose profiles)
+- [ ] T2 Schema + generator
+- [ ] T3 Rule engine
+- [ ] T4 Network ML
+- [ ] T5 Detection engine + response
+- [ ] T6 API + evaluation harness
+- [ ] T7 Vulnerable target
+- [ ] T8 Spring Boot responder gateway
+- [ ] T9 Attack lab
+- [ ] T10 OWASP findings + fixes
+- [ ] T11 Endpoint source
+- [ ] T12 Network source
+- [ ] T13 Splunk
+- [ ] T14 Grafana
+- [ ] T15 Anomaly models
+- [ ] T16 Phishing URL classifier
+- [ ] T17 Fraud model
+- [ ] T18 Triage agent
+- [ ] T19 Injection test suite
+- [ ] T20 CI security gates
+- [ ] T21 Platform security
+- [ ] T22 Terraform + Kubernetes (kind)
+- [ ] T23 Final evaluation
+- [ ] T24 Documentation
 
 ## Architecture
 
@@ -45,7 +74,7 @@ Sentinel ingests logs from four sources, detects attacks with ATT&CK-mapped rule
 Four sources are normalized into a single event schema and published to Kafka: application and auth logs, network flows and alerts from Zeek, and Windows endpoint events (process creation, service installs, PowerShell script blocks) from a WinPulse/Sysmon-style exporter.
 
 ### Rule-based detection
-12 Sigma-style YAML rules with Redis sliding windows, mapped to 8 MITRE ATT&CK techniques.
+12 planned Sigma-style YAML rules with Redis sliding windows, mapped to MITRE ATT&CK.
 
 | Rule | Detection | ATT&CK |
 |---|---|---|
@@ -84,7 +113,7 @@ Five actions run through a YAML response policy, and each is idempotent and audi
 The Spring Boot gateway enforces the blocklist (HTTP 403), rate limits, and JWT/RBAC on admin routes.
 
 ### Attack lab and vulnerability assessment
-`target-shop` v1 is a deliberately vulnerable e-commerce app covering SQL injection, reflected and stored XSS, IDOR, weak authentication, missing rate limiting, and security misconfiguration. The lab attacks it with Nmap, sqlmap, Hydra and OWASP ZAP, with manual testing in Burp Suite, and captures traffic with Wireshark/tshark for pcap validation. All 9 findings are documented in `docs/owasp-findings.md` with the Sentinel detection that fired, then closed in `target-shop` v2 and re-tested.
+`target-shop` v1 is a deliberately vulnerable e-commerce app covering SQL injection, reflected and stored XSS, IDOR, weak authentication, missing rate limiting, and security misconfiguration. The lab attacks it with Nmap, sqlmap, Hydra and OWASP ZAP, with manual testing in Burp Suite, and captures traffic with Wireshark/tshark for pcap validation. All findings will be documented in `docs/owasp-findings.md` with the Sentinel detection that fired, then closed in `target-shop` v2 and re-tested.
 
 ### Visibility
 Detections and incidents are forwarded to Splunk via HEC, with saved searches and a dashboard. Prometheus and Grafana track events per second, detections by ATT&CK technique, response actions and latency.
@@ -97,10 +126,10 @@ The agent summarizes an incident, maps it to ATT&CK and suggests remediation as 
 - The LLM never executes response actions itself.
 - Token and cost caps are enforced, and every prompt is audited.
 
-A test suite embeds 15+ prompt-injection strings in user-agent, path, username and command-line fields, and the agent stays on-schema for all of them.
+A test suite embeds 15+ prompt-injection strings in user-agent, path, username and command-line fields, and the pass rate is recorded in `results/metrics.json` (TBD).
 
 ### DevSecOps and platform security
-GitHub Actions runs Semgrep/CodeQL (SAST), Dependency-Check (SCA), Trivy (containers), Gitleaks (secrets), Checkov (IaC) and ZAP baseline (DAST), alongside 60+ Python and JUnit tests. Services use TLS with a dev CA, secrets live in Vault or Docker secrets, and database roles are least-privilege. Terraform and Kubernetes (kind) manifests deploy the platform, and its infrastructure is checked by the [Agent SecOps](https://github.com/GAURISHTODI/Agent-SecOps) gate.
+GitHub Actions runs Semgrep/CodeQL (SAST), Dependency-Check (SCA), Trivy (containers), Gitleaks (secrets), Checkov (IaC) and ZAP baseline (DAST), alongside Python and JUnit tests. Services use TLS with a dev CA, secrets live in Vault or Docker secrets, and database roles are least-privilege. Terraform and Kubernetes (kind) manifests deploy the platform, and its infrastructure is checked by the [Agent SecOps](https://github.com/GAURISHTODI/Agent-SecOps) gate.
 
 ## Results
 
@@ -108,15 +137,15 @@ Generated by `python -m sentinel.eval.evaluate` into `results/metrics.json`.
 
 | Metric | Result |
 |---|---|
-| Network IDS F1 (binary, CIC-IDS2017) | 0.97 |
-| Network IDS false-positive rate | 0.8% |
-| Sustained throughput | 1,000 events/sec (60,000 events per run) |
-| Block latency | < 300 ms |
-| Mean time to detect | < 2 s |
-| OWASP findings, v1 → v2 | 9 → 0 |
-| Prompt-injection suite | 100% on-schema (15+ strings) |
-| CI security scanners | 6 |
-| Automated tests | 60+ |
+| Network IDS F1 (binary, CIC-IDS2017) | TBD |
+| Network IDS false-positive rate | TBD |
+| Sustained throughput | TBD |
+| Block latency | TBD |
+| Mean time to detect | TBD |
+| OWASP findings, v1 → v2 | TBD |
+| Prompt-injection suite | TBD |
+| CI security scanners | TBD |
+| Automated tests | TBD |
 
 **Limitations:** CIC-IDS2017 and the public phishing and fraud datasets are curated, so real-world traffic will differ. The anomaly models are unsupervised and are reported separately from the supervised classifier. Synthetic logs approximate production telemetry and do not replace it.
 

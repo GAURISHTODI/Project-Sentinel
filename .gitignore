@@ -1,0 +1,37 @@
+# secrets
+.env
+*.pem
+*.key
+secrets/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# data and models (large, downloaded locally)
+data/*
+!data/.gitkeep
+mlruns/
+models/*.joblib
+models/*.pt
+
+# java
+target/
+*.class
+
+# terraform
+.terraform/
+*.tfstate*
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
