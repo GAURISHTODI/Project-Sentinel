@@ -32,6 +32,10 @@ from xgboost import XGBClassifier
 from sentinel.detect.ml.data import BENIGN, LABEL, LoadReport, load_cicids
 
 DEFAULT_DATA = Path("archive")
+DEFAULT_SOURCE = (
+    "CICIDS-2017 (MachineLearningCVE CSVs), user-supplied copy in the project folder archive/ "
+    "(Kaggle re-upload; exact Kaggle URL not provided)"
+)
 DEFAULT_OUT = Path("models/network")
 RESULTS = Path("results/ml")
 PLOTS = Path("results/plots")
@@ -146,7 +150,7 @@ def train(
     xgb_trees: int = 200,
     n_jobs: int = -1,
     mlflow_uri: str | None = None,
-    dataset_source: str = "unspecified (pass --dataset-source)",
+    dataset_source: str = DEFAULT_SOURCE,
     min_multi_support: int = 20,
 ) -> dict[str, Any]:
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -265,7 +269,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--rf-trees", type=int, default=100)
     ap.add_argument("--xgb-trees", type=int, default=200)
-    ap.add_argument("--dataset-source", default="unspecified (pass --dataset-source)")
+    ap.add_argument("--dataset-source", default=DEFAULT_SOURCE)
     ap.add_argument("--no-mlflow", action="store_true")
     a = ap.parse_args(argv)
 

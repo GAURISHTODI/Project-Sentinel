@@ -2,13 +2,28 @@
 # Never run everything at once on the 16 GB dev machine.
 #   docker compose --profile core up -d
 #   docker compose --profile core --profile viz up -d     # only when needed
-# API, gateway and target-shop services are added to `core` by T6-T8.
+# Profiles: `core` = data plane + target-shop (+ responder gateway, T8); `attack` = attack tools (T9).
 
 name: sentinel
 
 networks:
+  # Platform data plane (Kafka, Redis, Postgres) plus the services that use it. INTERNAL: no internet
+  # access, and not reachable from the attack tools.
+  backend:
+    name: sentinel-backend
+    internal: true
+  # Exists only so a few services can publish ports on 127.0.0.1 (Docker cannot publish ports from
+  # internal networks). The vulnerable target is never attached to it.
+  edge:
+    name: sentinel-edge
+  # The attack lab. INTERNAL: no route to the internet or to the host, so a mis-aimed tool cannot
+  # leave it. Only target-shop, the responder gateway and the attack-tool containers join it.
   lab:
     name: lab
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
 
 volumes:
   kafka-data:
@@ -18,10 +33,42 @@ volumes:
   grafana-data:
 
 services:
+  target-shop:
+    build: ./target-shop
+    image: sentinel/target-shop:1.0.0
+    profiles: ["core"]
+    networks:
+      backend: {}
+      lab:
+        ipv4_address: 172.30.0.11
+    # No published port and no `edge` network: the shop has no internet egress and is reachable only
+    # from the lab network (gateway and attack tools).
+    environment:
+      SHOP_VERSION: ${SHOP_VERSION:-v1}
+      SHOP_ADMIN_PASSWORD: ${SHOP_ADMIN_PASSWORD:-}
+      SHOP_FILES_DIR: /app/data/files
+      SHOP_KAFKA_ENABLED: "true"
+      SHOP_KAFKA_BOOTSTRAP: kafka:9092
+      SHOP_TRUSTED_PROXIES: 172.30.0.10   # the responder gateway
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx256m"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /api/health HTTP/1.0\r\n\r\n\" >&3 && head -n1 <&3 | grep -q 200'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    read_only: true
+    tmpfs: ["/tmp:rw,exec,nosuid,size=64m"]   # Kafka client unpacks a native lib here
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
   kafka:
     image: apache/kafka:3.8.1
     profiles: ["core"]
-    networks: [lab]
+    networks: [backend, edge]
     ports:
       - "127.0.0.1:${KAFKA_EXTERNAL_PORT:-29092}:29092"
     environment:
@@ -52,7 +99,7 @@ services:
   redis:
     image: redis:7-alpine
     profiles: ["core"]
-    networks: [lab]
+    networks: [backend, edge]
     command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --maxmemory 256mb --maxmemory-policy volatile-lru --appendonly no"]
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
@@ -70,7 +117,7 @@ services:
   postgres:
     image: postgres:16-alpine
     profiles: ["core"]
-    networks: [lab]
+    networks: [backend, edge]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-sentinel}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
@@ -91,7 +138,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.54.1
     profiles: ["viz"]
-    networks: [lab]
+    networks: [backend, edge]
     ports:
       - "127.0.0.1:9090:9090"
     volumes:
@@ -103,7 +150,7 @@ services:
   grafana:
     image: grafana/grafana:11.2.0
     profiles: ["viz"]
-    networks: [lab]
+    networks: [backend, edge]
     ports:
       - "127.0.0.1:3000:3000"
     environment:
@@ -115,7 +162,7 @@ services:
   splunk:
     image: splunk/splunk:9.3
     profiles: ["viz"]
-    networks: [lab]
+    networks: [backend, edge]
     ports:
       - "127.0.0.1:8000:8000"
       - "127.0.0.1:8088:8088"

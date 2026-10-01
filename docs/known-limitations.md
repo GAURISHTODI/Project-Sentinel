@@ -67,3 +67,15 @@
   effect on the next request); login throttling is per source IP and per username and keys off the socket
   address, so behind a proxy it would need a trusted forwarded-for setting; the API speaks plain HTTP until
   TLS is added in T21.
+
+## target-shop and log ingestion (T7)
+- **v1 is vulnerable on purpose.** Its flaws are the point; it must never leave the isolated lab network.
+  The compose file gives it no host port and no internet route (`lab` and `backend` are internal networks).
+- **No GeoIP for real logs.** The shop's logs carry no country, so SEN-006 (new-country login) cannot fire on
+  real shop traffic; it only fires on generated events that include a country.
+- **The access log has no authenticated user.** The shop does not resolve the session token per request, so
+  access events carry no username; login events do.
+- **Health-check traffic is logged.** The container health check requests `/api/health` every 10 s from
+  localhost, so the log is never completely idle (and localhost is a protected address, never blocked).
+- **Direct attacks bypass nothing yet:** until the gateway (T8) exists, nothing enforces Sentinel's blocks in
+  front of the shop; blocks are recorded in Redis only.

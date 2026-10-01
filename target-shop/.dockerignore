@@ -1,0 +1,4 @@
+target/*
+!target/target-shop-1.0.0.jar
+src
+pom.xml

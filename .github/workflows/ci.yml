@@ -34,3 +34,16 @@ jobs:
         with:
           name: coverage
           path: coverage.xml
+
+  java:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: target-shop (v1 exploitable, v2 fixed)
+        run: mvn -q -B -f target-shop/pom.xml test

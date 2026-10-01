@@ -31,7 +31,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T4 Network ML (RF + XGBoost binary, XGBoost multi-class, MLflow, model card; metrics TBD in README until T6)
 - [x] T5 Detection engine + response (rules + ML, policy YAML, 5 idempotent actions, hash-chained audit log; live Kafka/Redis/Postgres demo run)
 - [x] T6 API (JWT + RBAC) + evaluation harness (live and in-process) + CI workflow
-- [ ] T7 Vulnerable target
+- [x] T7 Vulnerable target (v1 vulnerable + v2 fixed twin, Kafka logs, normalizer, isolated lab network; 34 JUnit tests)
 - [ ] T8 Spring Boot responder gateway
 - [ ] T9 Attack lab
 - [ ] T10 OWASP findings + fixes

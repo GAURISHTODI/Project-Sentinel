@@ -3,7 +3,7 @@
   "trained_at": "2026-10-01 22:36:21",
   "dataset": {
     "name": "CIC-IDS2017 MachineLearningCVE",
-    "source": "unspecified (pass --dataset-source)",
+    "source": "CICIDS-2017 (MachineLearningCVE CSVs), user-supplied copy in the project folder archive/ (Kaggle re-upload; exact Kaggle URL not provided)",
     "load_report": {
       "files": [
         "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
