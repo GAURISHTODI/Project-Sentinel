@@ -82,3 +82,75 @@ def test_kafka_roundtrip_preserves_events() -> None:
             got.append(NormalizedEvent.model_validate(json.loads(msg.value())))
     consumer.close()
     assert [g.event_id for g in got] == [s.event_id for s in sent]
+
+
+# ------------------------------------------------------------------ PostgreSQL repository
+
+
+@pytest.fixture
+def pg():  # type: ignore[no-untyped-def]
+    import psycopg
+
+    from sentinel.respond.repo import PgRepo
+
+    dsn = get_settings().database_url.get_secret_value()
+    try:
+        repo = PgRepo(dsn)
+    except psycopg.OperationalError:
+        pytest.skip("Postgres from the compose core profile is not reachable")
+    tag = uuid.uuid4().hex[:8]
+    yield repo, tag, dsn
+    with psycopg.connect(dsn, autocommit=True) as c:  # test incidents/locks are removable
+        c.execute("DELETE FROM incidents WHERE event_id LIKE %s", (f"itest-{tag}%",))
+        c.execute("DELETE FROM locked_accounts WHERE username LIKE %s", (f"itest-{tag}%",))
+    repo.close()
+
+
+def _det(tag: str, ip: str, ts: float) -> "object":
+    from sentinel.common.schema import Detection
+
+    return Detection(
+        event_id=f"itest-{tag}-{ip}", rule_id="SEN-001", attack_id="T1110", severity="high",
+        score=0.8, src_ip=ip, user=f"itest-{tag}", timestamp_event=ts, explanation="integration",
+    )  # fmt: skip
+
+
+def test_pg_incident_grouping_and_lock_roundtrip(pg) -> None:  # type: ignore[no-untyped-def]
+    repo, tag, dsn = pg
+    ip = f"203.0.113.{uuid.UUID(tag.ljust(32, '0')).int % 200 + 20}"
+    d1, d2 = _det(tag, ip, 1_700_000_000.0), _det(tag, ip, 1_700_000_050.0)
+    a, b = repo.create_incident(d1), repo.create_incident(d2)
+    assert a.created and not b.created and a.incident_id == b.incident_id
+    import psycopg
+
+    with psycopg.connect(dsn) as c:
+        count, status = c.execute(
+            "SELECT event_count, status FROM incidents WHERE id = %s", (a.incident_id,)
+        ).fetchone()
+    assert (count, status) == (2, "open")
+    repo.mark_responded(a.incident_id, 1_700_000_001.0)
+    user = f"itest-{tag}"
+    assert repo.lock_account(user, "test", 1_900_000_000.0) is True
+    assert repo.lock_account(user, "test", 1_900_000_000.0) is False  # idempotent
+    assert repo.unlock_account(user) is True and repo.unlock_account(user) is False
+
+
+def test_pg_audit_chain_verifies_and_detects_tampering(pg) -> None:  # type: ignore[no-untyped-def]
+    import psycopg
+
+    repo, tag, dsn = pg
+    for i in range(3):
+        repo.audit("itest", "act", f"{tag}-{i}", {"i": i, "tag": tag, "nested": {"b": 1, "a": 2}})
+    ok, n = repo.verify_chain()
+    assert ok and n >= 3
+    with psycopg.connect(dsn, autocommit=True) as c:
+        row = c.execute(
+            "SELECT id, target FROM audit_log WHERE actor = 'itest' AND target = %s", (f"{tag}-1",)
+        ).fetchone()
+        assert row is not None
+        try:
+            c.execute("UPDATE audit_log SET target = 'forged' WHERE id = %s", (row[0],))
+            assert repo.verify_chain()[0] is False
+        finally:
+            c.execute("UPDATE audit_log SET target = %s WHERE id = %s", (row[1], row[0]))
+    assert repo.verify_chain()[0] is True

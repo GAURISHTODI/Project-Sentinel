@@ -29,7 +29,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T2 Schema + generator (20 tests; live Kafka publish and round trip verified)
 - [x] T3 Rule engine (SEN-001..009; verified on real Redis)
 - [x] T4 Network ML (RF + XGBoost binary, XGBoost multi-class, MLflow, model card; metrics TBD in README until T6)
-- [ ] T5 Detection engine + response
+- [x] T5 Detection engine + response (rules + ML, policy YAML, 5 idempotent actions, hash-chained audit log; live Kafka/Redis/Postgres demo run)
 - [ ] T6 API + evaluation harness
 - [ ] T7 Vulnerable target
 - [ ] T8 Spring Boot responder gateway

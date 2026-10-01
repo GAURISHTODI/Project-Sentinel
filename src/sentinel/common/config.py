@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     database_url: SecretStr = Field(
         default=SecretStr("postgresql://sentinel@localhost:5432/sentinel")
     )
+    webhook_url: SecretStr = Field(default=SecretStr(""))  # Slack/Teams incoming webhook
+    webhook_flavor: str = "slack"
     llm_provider: str = "mock"
     llm_api_key: SecretStr = Field(default=SecretStr(""))
 

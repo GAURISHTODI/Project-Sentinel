@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from pydantic import BaseModel
+
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import NormalizedEvent
 
@@ -39,6 +41,21 @@ class EventProducer:
             self._p.poll(0.5)
             self._p.produce(self.topic, value, key)
         self.sent += 1
+        self._p.poll(0)
+
+    def send_model(self, model: BaseModel, key: str) -> None:
+        """Publish any pydantic model (e.g. a Detection) as JSON with an explicit partition key."""
+        value = model.model_dump_json().encode()
+        try:
+            self._p.produce(self.topic, value, key.encode())
+        except BufferError:
+            self._p.poll(0.5)
+            self._p.produce(self.topic, value, key.encode())
+        self.sent += 1
+        self._p.poll(0)
+
+    def poll(self) -> None:
+        """Serve delivery callbacks without blocking (keeps the local queue draining)."""
         self._p.poll(0)
 
     def flush(self) -> None:

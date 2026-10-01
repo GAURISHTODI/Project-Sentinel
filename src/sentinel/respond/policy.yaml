@@ -1,0 +1,41 @@
+# Sentinel response policy. See sentinel/respond/policy.py for how this is resolved.
+dry_run: false
+
+# Addresses that are NEVER auto-blocked or rate-limited (a false positive here would be an outage).
+# Deployments must add their gateways, load balancers and shared NAT / VPN egress addresses.
+protected_cidrs:
+  - 127.0.0.0/8
+  - "::1/128"
+  - 169.254.0.0/16
+
+# Block only on detections at or above this severity (rule-level `block_ip` entries below it are skipped).
+min_block_severity: medium
+
+# Suppress repeat notifications for the same detector + source for this long.
+notify_cooldown_seconds: 300
+
+# One source tripping several different detectors is more likely a real attacker than a noisy client.
+escalation:
+  enabled: true
+  distinct_detectors: 3
+  window_seconds: 300
+  block_ttl_seconds: 3600
+
+# Used when a detector has neither an override nor its own `response:` list.
+severity_defaults:
+  low:
+    - action: create_incident
+  medium:
+    - action: create_incident
+  high:
+    - action: create_incident
+    - action: notify
+  critical:
+    - action: create_incident
+    - action: notify
+    - action: block_ip
+      ttl_seconds: 3600
+
+# Per-detector overrides take precedence over the rule's own response list. Keys are rule ids or
+# model names. Example (disabled): keep valid-account abuse analyst-only, never automatic.
+overrides: {}

@@ -52,6 +52,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "sentinel.detect.rules" = ["rules/*.yaml"]
+"sentinel.respond" = ["policy.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

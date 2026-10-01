@@ -31,3 +31,23 @@
 - **Destination Port is a feature** and can act as a shortcut for attacks aimed at one port. No ablation yet.
 - **The generator's synthetic flows use different feature names** from CIC-IDS2017, so the ML models cannot
   score them. Evaluation of the ML models uses the held-out CIC test split only.
+
+## Detection engine and response (T5)
+- **Windows are partition-local with write-behind to Redis.** A Redis round trip costs about 1 ms through
+  Docker Desktop on Windows, which capped rules at roughly 1,200 events/s and left a live backlog (mean
+  time-to-detect 15 s). Window state now lives in the consumer process and is mirrored to Redis in batches.
+  This is exact only because Kafka keys events by source IP (one consumer sees every event of an IP). After a
+  restart the windows start empty (up to one window of history is lost); Redis is not read back.
+  Scaling to several consumers works for per-IP rules but a rule grouped by something other than the key
+  (for example per user) would need a shared store.
+- **Repeat suppression.** Repeat detections of an already-handled incident are counted in memory for 30 s and
+  written to Postgres in batches, so a repeat does not re-run actions. A block lifted by an analyst can
+  therefore be re-applied up to 30 s late.
+- **Dry-run still records incidents** (that is how a policy is judged before enforcement) but never touches
+  Redis keys, locks or the webhook.
+- **Protected addresses are a short default list** (loopback, link-local). A real deployment must add its
+  gateways, load balancers and shared NAT/VPN egress, or a noisy shared address could be blocked.
+- **ML detector sees no synthetic flows.** Generator flows lack the CIC feature set, so the network model only
+  fires on CIC-style flows (used in evaluation), not on generated traffic.
+- Latency numbers quoted during development came from single informal runs; the official figures are produced
+  by `python -m sentinel.eval.evaluate` (T6).
