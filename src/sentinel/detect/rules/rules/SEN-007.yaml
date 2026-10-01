@@ -1,0 +1,20 @@
+id: SEN-007
+title: HTTP request flood
+description: A single source sending over 15 requests/s for 10 s. Threshold sits above the busiest benign source (shared NAT, about 12 req/s at 1000 eps); slower floods are not caught.
+attack_id: T1499
+severity: high
+condition:
+  selection:
+    source: app
+    event_type: http_request
+  window:
+    group_by: [src_ip]
+    seconds: 10
+    threshold: 150
+response:
+  - action: block_ip
+    ttl_seconds: 900
+  - action: rate_limit
+    limit_per_minute: 30
+  - action: create_incident
+  - action: notify

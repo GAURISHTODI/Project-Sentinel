@@ -1,0 +1,19 @@
+id: SEN-004
+title: Port scan
+description: One source touching many distinct destination ports within a few seconds.
+attack_id: T1046
+severity: medium
+condition:
+  selection:
+    source: network
+    event_type: flow
+  window:
+    group_by: [src_ip]
+    distinct: dst_port
+    seconds: 10
+    threshold: 15
+response:
+  - action: block_ip
+    ttl_seconds: 3600
+  - action: create_incident
+  - action: notify

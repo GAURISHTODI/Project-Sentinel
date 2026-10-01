@@ -41,6 +41,7 @@ dev = [
     "ruff>=0.6,<1",
     "mypy>=1.11,<2",
     "types-PyYAML",
+    "fakeredis>=2.23,<3",
     "pre-commit>=3.8,<5",
 ]
 

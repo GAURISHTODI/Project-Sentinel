@@ -1,0 +1,13 @@
+id: SEN-005
+title: Known scanner user-agent
+description: Request from a user-agent string used by common security scanners and attack tools.
+attack_id: T1595
+severity: low
+condition:
+  selection:
+    source: app
+    user_agent|re: ["sqlmap", "nikto", "nmap", "hydra", "zap", "masscan", "gobuster", "dirbuster", "wfuzz", "acunetix"]
+response:
+  - action: rate_limit
+    limit_per_minute: 10
+  - action: create_incident

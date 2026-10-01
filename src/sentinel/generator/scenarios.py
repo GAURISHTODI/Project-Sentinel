@@ -33,11 +33,11 @@ class World:
         for i in range(self.n_users):
             u = f"user{i:04d}"
             self.users.append(u)
-            # every tenth user shares one NAT-like address: a benign high-volume source
+            # five users (1%) share one NAT-like address: a benign higher-volume source
             self.home_ip[u] = (
-                f"10.20.{rng.randint(0, 3)}.{rng.randint(1, 254)}" if i % 10 else "10.30.0.1"
+                f"10.20.{rng.randint(0, 3)}.{rng.randint(1, 254)}" if i % 100 else "10.30.0.1"
             )
-            self.weights.append(1.0 / (1 + i % 50))  # zipf-ish activity
+            self.weights.append(1.0 / (1 + i % 5))  # mild skew: some users are more active
 
 
 Campaign = Callable[[random.Random, World], Iterator[NormalizedEvent]]
@@ -236,9 +236,9 @@ def port_scan(rng: random.Random, w: World) -> Iterator[NormalizedEvent]:
 
 
 def dos(rng: random.Random, w: World) -> Iterator[NormalizedEvent]:
-    ips = [attacker_ip(rng) for _ in range(rng.randint(1, 4))]
+    ips = [attacker_ip(rng) for _ in range(rng.randint(1, 2))]
     ua = rng.choice(p.BENIGN_UAS)
-    for _ in range(rng.randint(200, 500)):
+    for _ in range(rng.randint(800, 2000)):  # sustained: a flood lasts tens of seconds
         yield NormalizedEvent(
             source="app",
             event_type="http_request",

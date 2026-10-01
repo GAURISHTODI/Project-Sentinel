@@ -1,0 +1,15 @@
+id: SEN-009
+title: Path traversal attempt
+description: Directory traversal sequences in the request path (after URL-decoding).
+attack_id: T1190
+severity: medium
+condition:
+  selection:
+    - path_decoded|re:
+        - '\.\.[/\\]'
+        - '/etc/(passwd|shadow|hosts)'
+        - 'win\.ini'
+response:
+  - action: rate_limit
+    limit_per_minute: 20
+  - action: create_incident

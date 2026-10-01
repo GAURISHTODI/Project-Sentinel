@@ -18,7 +18,7 @@ DEFAULT_MIX: dict[str, float] = {
     "path_traversal": 2.0,
     "scanner": 3.0,
     "port_scan": 0.5,
-    "dos": 0.4,
+    "dos": 0.15,
     "valid_account_abuse": 6.0,
     "endpoint_powershell": 8.0,
     "endpoint_spawn": 8.0,

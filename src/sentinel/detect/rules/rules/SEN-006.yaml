@@ -1,0 +1,17 @@
+id: SEN-006
+title: Valid account used from a new country
+description: Successful login for a user from a country never seen for that user, after at least min_baseline earlier successful logins.
+attack_id: T1078
+severity: medium
+condition:
+  selection:
+    source: auth
+    event_type: login
+    status: 200
+  novelty:
+    entity: user
+    attribute: country
+    min_baseline: 3
+response:
+  - action: create_incident
+  - action: notify

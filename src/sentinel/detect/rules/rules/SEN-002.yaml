@@ -1,0 +1,23 @@
+id: SEN-002
+title: SQL injection attempt
+description: SQL metacharacters or keywords in the URL or username (matched after URL-decoding).
+attack_id: T1190
+severity: high
+condition:
+  selection:
+    - path_decoded|re:
+        - 'union\s+(all\s+)?select'
+        - '''\s*(or|and)\s*''?\d+''?\s*=\s*''?\d+'
+        - '''\s*(--|#)'
+        - ';\s*(drop|delete|insert|update|truncate)\s'
+        - '(sleep|benchmark)\s*\(\s*\d'
+        - 'order\s+by\s+\d+\s*(--|#)'
+    - user_decoded|re:
+        - 'union\s+(all\s+)?select'
+        - '''\s*(or|and)\s*''?\d+''?\s*=\s*''?\d+'
+        - '''\s*(--|#)'
+response:
+  - action: block_ip
+    ttl_seconds: 1800
+  - action: create_incident
+  - action: notify

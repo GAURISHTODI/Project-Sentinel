@@ -1,0 +1,20 @@
+id: SEN-008
+title: Credential stuffing
+description: One source failing logins across many different usernames.
+attack_id: T1110.004
+severity: high
+condition:
+  selection:
+    source: auth
+    event_type: login
+    status: 401
+  window:
+    group_by: [src_ip]
+    distinct: user
+    seconds: 60
+    threshold: 10
+response:
+  - action: block_ip
+    ttl_seconds: 7200
+  - action: create_incident
+  - action: notify

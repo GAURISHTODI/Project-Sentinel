@@ -1,0 +1,20 @@
+id: SEN-001
+title: Brute-force login against one account
+description: Many failed logins for the same user from the same source IP in a short window.
+attack_id: T1110
+severity: high
+condition:
+  selection:
+    source: auth
+    event_type: login
+    status: 401
+  window:
+    group_by: [src_ip, user]
+    seconds: 60
+    threshold: 10
+response:
+  - action: block_ip
+    ttl_seconds: 3600
+  - action: lock_account
+  - action: create_incident
+  - action: notify

@@ -1,0 +1,16 @@
+id: SEN-003
+title: Cross-site scripting attempt
+description: Script tags, inline event handlers or javascript URIs in the request (after URL-decoding).
+attack_id: T1190
+severity: medium
+condition:
+  selection:
+    - path_decoded|re:
+        - '<\s*script'
+        - '<\s*(img|svg|iframe|body)[^>]*\bon\w+\s*='
+        - 'javascript\s*:'
+        - '\bon(error|load|mouseover)\s*='
+response:
+  - action: rate_limit
+    limit_per_minute: 20
+  - action: create_incident
