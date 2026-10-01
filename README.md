@@ -27,7 +27,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 
 - [x] T1 Scaffold + infra (Kafka KRaft, Redis, PostgreSQL, compose profiles)
 - [ ] T2 Schema + generator (code, 20 tests and JSONL demo done; live Kafka publish demo pending Docker)
-- [ ] T3 Rule engine
+- [x] T3 Rule engine (SEN-001..009; Redis state tested on fakeredis, real-Redis check pending Docker)
 - [ ] T4 Network ML
 - [ ] T5 Detection engine + response
 - [ ] T6 API + evaluation harness
