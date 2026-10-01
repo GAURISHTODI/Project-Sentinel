@@ -32,7 +32,10 @@ public class HeadersFilter extends OncePerRequestFilter {
             res.setHeader("X-Frame-Options", "DENY");
             res.setHeader("Referrer-Policy", "no-referrer");
             res.setHeader("Cache-Control", "no-store");
-            res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'none'; frame-ancestors 'none'");
+            // base-uri and form-action do not fall back to default-src per the CSP spec, so they are
+            // listed explicitly (ZAP rule 10055: "Failure to Define Directive with No Fallback").
+            res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'none'; "
+                    + "frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
             res.setHeader("Permissions-Policy", "geolocation=(), camera=(), microphone=()");
         } else {
             res.setHeader("Access-Control-Allow-Origin", "*");

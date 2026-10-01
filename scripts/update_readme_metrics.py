@@ -108,8 +108,15 @@ def rows(m: dict[str, Any]) -> list[tuple[str, str]]:
         out.append((label, "measured, see metrics.json" if dig(m, "ml", key) else TBD))
     inj = dig(m, "injection", "pass_rate")
     out.append(("Prompt-injection suite", f"{inj:.0%} on-schema" if inj is not None else TBD))
+    owasp = dig(m, "owasp")
     out.append(
-        ("OWASP findings, v1 to v2", TBD if dig(m, "owasp") is None else str(dig(m, "owasp")))
+        (
+            "OWASP findings, v1 to v2",
+            f"{owasp['v1_open']} → {owasp['v2_open']} "
+            f"(re-verified live: sqlmap, Hydra, ZAP full active scan, {owasp['junit_tests']} JUnit tests)"
+            if owasp
+            else TBD,
+        )
     )
     out.append(("CI security scanners", TBD if dig(m, "ci") is None else str(dig(m, "ci"))))
     t = dig(m, "tests") or {}
