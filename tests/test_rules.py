@@ -227,7 +227,8 @@ def test_window_state_is_per_group() -> None:
 
 
 def test_detectors_never_see_label() -> None:
-    assert "label" not in build_facts(ev(label="sqli", path="/"))
+    facts = build_facts(ev(label="sqli", campaign="c1", path="/"))
+    assert "label" not in facts and "campaign" not in facts
     # a detection must not change when the label changes
     a = engine().evaluate(ev(path="/s?q=' OR 1=1--", label="benign"))
     b = engine().evaluate(ev(path="/s?q=' OR 1=1--", label="sqli"))
@@ -244,6 +245,9 @@ def test_rule_referencing_label_is_rejected() -> None:
         "response": [{"action": "notify"}],
     }
     with pytest.raises(ValidationError, match="label"):
+        Rule.model_validate(bad)
+    bad["condition"] = {"selection": {"campaign": "c1"}}
+    with pytest.raises(ValidationError, match="campaign"):
         Rule.model_validate(bad)
 
 

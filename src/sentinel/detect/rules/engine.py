@@ -32,8 +32,8 @@ Matcher = Callable[[Facts], bool]
 
 
 def build_facts(ev: NormalizedEvent) -> dict[str, Any]:
-    """Flat dict a rule can read. The evaluation `label` is excluded on purpose."""
-    facts = ev.model_dump(exclude={"label"})
+    """Flat dict a rule can read; evaluation-only fields (label, campaign) are left out."""
+    facts = ev.model_dump(exclude={"label", "campaign"})
     for name, value in (facts.pop("flow_features") or {}).items():
         facts[f"flow_{name}"] = value
     if facts.get("path"):

@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     )
     webhook_url: SecretStr = Field(default=SecretStr(""))  # Slack/Teams incoming webhook
     webhook_flavor: str = "slack"
+    jwt_secret: SecretStr = Field(default=SecretStr(""))  # required to start the API (>= 32 chars)
+    jwt_ttl_minutes: int = 30
+    api_docs: bool = False  # expose /docs only in development
     llm_provider: str = "mock"
     llm_api_key: SecretStr = Field(default=SecretStr(""))
 

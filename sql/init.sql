@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE users ADD COLUMN IF NOT EXISTS disabled BOOLEAN NOT NULL DEFAULT false;
+
 CREATE TABLE IF NOT EXISTS incidents (
     id            BIGSERIAL PRIMARY KEY,
     event_id      TEXT NOT NULL,

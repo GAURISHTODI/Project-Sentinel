@@ -63,7 +63,7 @@ def build_pipeline(
 
 
 def main(argv: list[str] | None = None) -> int:
-    from confluent_kafka import Consumer
+    from confluent_kafka import Consumer, TopicPartition
 
     ap = argparse.ArgumentParser(description="Sentinel detection + response service")
     ap.add_argument("--group", default="sentinel-detect")
@@ -93,7 +93,11 @@ def main(argv: list[str] | None = None) -> int:
             "enable.auto.commit": False,
         }
     )
-    consumer.subscribe([cfg.events_topic])
+
+    def on_assign(_c: Consumer, partitions: list[TopicPartition]) -> None:
+        print(f"READY partitions={len(partitions)}", file=sys.stderr, flush=True)
+
+    consumer.subscribe([cfg.events_topic], on_assign=on_assign)
     started = last_msg = time.time()
     seen_any = False
     uncommitted = 0

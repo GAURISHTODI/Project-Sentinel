@@ -1,0 +1,813 @@
+{
+  "generated_at": "2026-10-01T17:46:22+00:00",
+  "git_commit": "2b043eb",
+  "config": {
+    "mode": "live",
+    "eps": 1000,
+    "duration_s": 60,
+    "seed": 42,
+    "attack_ratio": 0.1
+  },
+  "pipeline": {
+    "events": 60000,
+    "attack_events": 6000,
+    "campaigns": 448,
+    "detections": 1747,
+    "scenarios": {
+      "endpoint_service": {
+        "campaigns": 210,
+        "events": 210,
+        "detected_any": 0,
+        "detected_expected": 0,
+        "covered": false,
+        "recall_expected_rule": 0.0
+      },
+      "endpoint_powershell": {
+        "campaigns": 56,
+        "events": 228,
+        "detected_any": 0,
+        "detected_expected": 0,
+        "covered": false,
+        "recall_expected_rule": 0.0
+      },
+      "sqli": {
+        "campaigns": 12,
+        "events": 475,
+        "detected_any": 12,
+        "detected_expected": 12,
+        "covered": true,
+        "recall_expected_rule": 1.0,
+        "event_recall": 1.0
+      },
+      "path_traversal": {
+        "campaigns": 15,
+        "events": 354,
+        "detected_any": 15,
+        "detected_expected": 15,
+        "covered": true,
+        "recall_expected_rule": 1.0,
+        "event_recall": 1.0
+      },
+      "endpoint_spawn": {
+        "campaigns": 64,
+        "events": 204,
+        "detected_any": 0,
+        "detected_expected": 0,
+        "covered": false,
+        "recall_expected_rule": 0.0
+      },
+      "valid_account_abuse": {
+        "campaigns": 43,
+        "events": 248,
+        "detected_any": 32,
+        "detected_expected": 32,
+        "covered": true,
+        "recall_expected_rule": 0.7442
+      },
+      "scanner": {
+        "campaigns": 19,
+        "events": 462,
+        "detected_any": 19,
+        "detected_expected": 19,
+        "covered": true,
+        "recall_expected_rule": 1.0,
+        "event_recall": 1.0
+      },
+      "xss": {
+        "campaigns": 11,
+        "events": 380,
+        "detected_any": 11,
+        "detected_expected": 11,
+        "covered": true,
+        "recall_expected_rule": 1.0,
+        "event_recall": 1.0
+      },
+      "brute_force": {
+        "campaigns": 10,
+        "events": 1078,
+        "detected_any": 10,
+        "detected_expected": 10,
+        "covered": true,
+        "recall_expected_rule": 1.0
+      },
+      "credential_stuffing": {
+        "campaigns": 5,
+        "events": 686,
+        "detected_any": 5,
+        "detected_expected": 5,
+        "covered": true,
+        "recall_expected_rule": 1.0
+      },
+      "port_scan": {
+        "campaigns": 2,
+        "events": 448,
+        "detected_any": 2,
+        "detected_expected": 2,
+        "covered": true,
+        "recall_expected_rule": 1.0
+      },
+      "dos": {
+        "campaigns": 1,
+        "events": 1227,
+        "detected_any": 1,
+        "detected_expected": 1,
+        "covered": true,
+        "recall_expected_rule": 1.0
+      }
+    },
+    "overall": {
+      "covered_scenarios": [
+        "brute_force",
+        "credential_stuffing",
+        "dos",
+        "path_traversal",
+        "port_scan",
+        "scanner",
+        "sqli",
+        "valid_account_abuse",
+        "xss"
+      ],
+      "uncovered_scenarios": [
+        "endpoint_powershell",
+        "endpoint_service",
+        "endpoint_spawn"
+      ],
+      "campaigns_covered": 118,
+      "campaign_recall_expected_rule": 0.9068
+    },
+    "per_rule": {
+      "SEN-001": {
+        "detections": 10,
+        "true_positive_detections": 10,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 10,
+        "campaigns_detected": 10,
+        "campaign_recall": 1.0
+      },
+      "SEN-002": {
+        "detections": 475,
+        "true_positive_detections": 475,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 12,
+        "campaigns_detected": 12,
+        "campaign_recall": 1.0
+      },
+      "SEN-003": {
+        "detections": 380,
+        "true_positive_detections": 380,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 11,
+        "campaigns_detected": 11,
+        "campaign_recall": 1.0
+      },
+      "SEN-004": {
+        "detections": 2,
+        "true_positive_detections": 2,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 2,
+        "campaigns_detected": 2,
+        "campaign_recall": 1.0
+      },
+      "SEN-005": {
+        "detections": 462,
+        "true_positive_detections": 462,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 19,
+        "campaigns_detected": 19,
+        "campaign_recall": 1.0
+      },
+      "SEN-006": {
+        "detections": 53,
+        "true_positive_detections": 46,
+        "false_positive_detections": 7,
+        "precision": 0.8679,
+        "campaigns": 43,
+        "campaigns_detected": 32,
+        "campaign_recall": 0.7442
+      },
+      "SEN-007": {
+        "detections": 6,
+        "true_positive_detections": 6,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 1,
+        "campaigns_detected": 1,
+        "campaign_recall": 1.0
+      },
+      "SEN-008": {
+        "detections": 5,
+        "true_positive_detections": 5,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 5,
+        "campaigns_detected": 5,
+        "campaign_recall": 1.0
+      },
+      "SEN-009": {
+        "detections": 354,
+        "true_positive_detections": 354,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 15,
+        "campaigns_detected": 15,
+        "campaign_recall": 1.0
+      }
+    },
+    "false_positives": {
+      "benign_events": 54000,
+      "benign_events_alerted": 7,
+      "false_positive_rate_event": 0.00013,
+      "by_rule": {
+        "SEN-006": 7
+      }
+    },
+    "confusion_matrix": {
+      "note": "rows: true scenario; cols: rule that detected the campaign (attacks, campaign level) or alerted on the event (benign row)",
+      "columns": [
+        "SEN-001",
+        "SEN-002",
+        "SEN-003",
+        "SEN-004",
+        "SEN-005",
+        "SEN-006",
+        "SEN-007",
+        "SEN-008",
+        "SEN-009",
+        "none"
+      ],
+      "rows": {
+        "endpoint_service": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 210
+        },
+        "endpoint_powershell": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 56
+        },
+        "sqli": {
+          "SEN-001": 0,
+          "SEN-002": 12,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "path_traversal": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 15,
+          "none": 0
+        },
+        "endpoint_spawn": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 64
+        },
+        "valid_account_abuse": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 32,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 11
+        },
+        "scanner": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 19,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "xss": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 11,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "brute_force": {
+          "SEN-001": 10,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "credential_stuffing": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 5,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "port_scan": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 2,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "dos": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 0,
+          "SEN-007": 1,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 0
+        },
+        "benign (events)": {
+          "SEN-001": 0,
+          "SEN-002": 0,
+          "SEN-003": 0,
+          "SEN-004": 0,
+          "SEN-005": 0,
+          "SEN-006": 7,
+          "SEN-007": 0,
+          "SEN-008": 0,
+          "SEN-009": 0,
+          "none": 53993
+        }
+      }
+    },
+    "latency": {
+      "time_to_detect": {
+        "n": 107,
+        "mean_ms": 196.4,
+        "p50_ms": 83.5,
+        "p95_ms": 207.2,
+        "max_ms": 9085.2
+      },
+      "pipeline_per_detection": {
+        "n": 1747,
+        "mean_ms": 85.3,
+        "p50_ms": 79.3,
+        "p95_ms": 170.1,
+        "max_ms": 268.3
+      },
+      "time_to_respond": {
+        "n": 70,
+        "mean_ms": 260.7,
+        "p50_ms": 91.3,
+        "p95_ms": 1009.9,
+        "max_ms": 9087.9
+      },
+      "note": null
+    },
+    "throughput": {
+      "events": 60000,
+      "seconds": 59.02,
+      "events_per_second": 1016.6,
+      "service_events_processed": 60000,
+      "service_invalid_dropped": 0
+    }
+  },
+  "rules": {
+    "count": 9,
+    "attack_techniques": [
+      "T1046",
+      "T1078",
+      "T1110",
+      "T1110.004",
+      "T1190",
+      "T1499",
+      "T1595"
+    ],
+    "technique_count": 7
+  },
+  "tests": {
+    "python_collected": 144,
+    "java_junit": null
+  },
+  "ml": {
+    "network": {
+      "rf_binary": {
+        "precision": 0.996937212863706,
+        "recall": 0.9937552039966694,
+        "f1": 0.9953436652998818,
+        "false_positive_rate": 0.000685422313611864,
+        "false_negative_rate": 0.0062447960033305576,
+        "roc_auc": 0.9999210280494204,
+        "pr_auc": 0.9996625644535296,
+        "confusion_matrix": {
+          "labels": [
+            "benign",
+            "attack"
+          ],
+          "matrix": [
+            [
+              32075,
+              22
+            ],
+            [
+              45,
+              7161
+            ]
+          ]
+        },
+        "threshold": 0.5,
+        "n_test": 39303
+      },
+      "xgb_binary": {
+        "precision": 0.9962577962577963,
+        "recall": 0.9975020815986678,
+        "f1": 0.9968795506552943,
+        "false_positive_rate": 0.000841200112160015,
+        "false_negative_rate": 0.002497918401332223,
+        "roc_auc": 0.9999558413392875,
+        "pr_auc": 0.9998042430849984,
+        "confusion_matrix": {
+          "labels": [
+            "benign",
+            "attack"
+          ],
+          "matrix": [
+            [
+              32070,
+              27
+            ],
+            [
+              18,
+              7188
+            ]
+          ]
+        },
+        "threshold": 0.5,
+        "n_test": 39303
+      },
+      "xgb_multi": {
+        "macro_f1": 0.8898450157674375,
+        "weighted_f1": 0.9982845586708882,
+        "accuracy": 0.9983204824795786,
+        "per_class": {
+          "BENIGN": {
+            "precision": 0.999501324606514,
+            "recall": 0.9991276443281304,
+            "f1-score": 0.9993144495341373,
+            "support": 32097.0
+          },
+          "Bot": {
+            "precision": 0.7727272727272727,
+            "recall": 0.6071428571428571,
+            "f1-score": 0.68,
+            "support": 28.0
+          },
+          "DDoS": {
+            "precision": 1.0,
+            "recall": 0.9994472084024323,
+            "f1-score": 0.9997235277854576,
+            "support": 1809.0
+          },
+          "DoS GoldenEye": {
+            "precision": 1.0,
+            "recall": 0.9863013698630136,
+            "f1-score": 0.993103448275862,
+            "support": 146.0
+          },
+          "DoS Hulk": {
+            "precision": 0.9977994341402074,
+            "recall": 0.9996850393700787,
+            "f1-score": 0.9987413467589679,
+            "support": 3175.0
+          },
+          "DoS Slowhttptest": {
+            "precision": 0.9746835443037974,
+            "recall": 0.9871794871794872,
+            "f1-score": 0.9808917197452229,
+            "support": 78.0
+          },
+          "DoS slowloris": {
+            "precision": 0.9878048780487805,
+            "recall": 0.9878048780487805,
+            "f1-score": 0.9878048780487805,
+            "support": 82.0
+          },
+          "FTP-Patator": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 109.0
+          },
+          "Infiltration": {
+            "precision": 1.0,
+            "recall": 0.7142857142857143,
+            "f1-score": 0.8333333333333334,
+            "support": 7.0
+          },
+          "PortScan": {
+            "precision": 0.98989898989899,
+            "recall": 1.0,
+            "f1-score": 0.9949238578680203,
+            "support": 1666.0
+          },
+          "SSH-Patator": {
+            "precision": 1.0,
+            "recall": 0.9830508474576272,
+            "f1-score": 0.9914529914529915,
+            "support": 59.0
+          },
+          "Web Attack Brute Force": {
+            "precision": 0.6,
+            "recall": 0.42857142857142855,
+            "f1-score": 0.5,
+            "support": 21.0
+          },
+          "Web Attack XSS": {
+            "precision": 0.5384615384615384,
+            "recall": 0.7,
+            "f1-score": 0.6086956521739131,
+            "support": 20.0
+          }
+        },
+        "confusion_matrix": {
+          "labels": [
+            "BENIGN",
+            "Bot",
+            "DDoS",
+            "DoS GoldenEye",
+            "DoS Hulk",
+            "DoS Slowhttptest",
+            "DoS slowloris",
+            "FTP-Patator",
+            "Infiltration",
+            "PortScan",
+            "SSH-Patator",
+            "Web Attack Brute Force",
+            "Web Attack XSS"
+          ],
+          "matrix": [
+            [
+              32069,
+              5,
+              0,
+              0,
+              6,
+              0,
+              0,
+              0,
+              0,
+              17,
+              0,
+              0,
+              0
+            ],
+            [
+              11,
+              17,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1808,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              144,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              0,
+              3174,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              77,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              81,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              109,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              5,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1666,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              58,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              9,
+              12
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              6,
+              14
+            ]
+          ]
+        },
+        "n_test": 39297,
+        "classes_not_trained": {
+          "Web Attack SQL Injection": 17,
+          "Heartbleed": 9
+        }
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from sentinel.common.schema import NormalizedEvent, Severity
 
 # Fields a rule may read. `label` is deliberately absent: detectors never see ground truth.
-EVENT_FIELDS = (set(NormalizedEvent.model_fields) - {"label", "flow_features"}) | {
+EVENT_FIELDS = (set(NormalizedEvent.model_fields) - {"label", "campaign", "flow_features"}) | {
     "path_decoded",
     "user_decoded",
 }
@@ -18,8 +18,8 @@ MODIFIERS = {"contains", "startswith", "endswith", "re", "gt", "gte", "lt", "lte
 
 def check_field(name: str) -> None:
     field = name.split("|")[0]
-    if field == "label":
-        raise ValueError("rules must not read 'label' (evaluation-only ground truth)")
+    if field in {"label", "campaign"}:
+        raise ValueError(f"rules must not read {field!r} (evaluation-only ground truth)")
     if field not in EVENT_FIELDS and not field.startswith("flow_"):
         raise ValueError(f"unknown event field {field!r}")
 

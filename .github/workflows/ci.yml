@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev,ml]"
+      - name: Lint
+        run: ruff check . && ruff format --check .
+      - name: Type check
+        run: mypy src
+      - name: Tests (integration tests skip when Kafka/Redis/Postgres are not running)
+        run: pytest -q --cov=sentinel --cov-report=term-missing --cov-report=xml
+      - name: In-process evaluation (no Docker; logic metrics only)
+        run: python -m sentinel.eval.evaluate --mode inproc --duration 20 --out /tmp/metrics.json
+      - name: README results are generated, not hand-edited
+        run: python scripts/update_readme_metrics.py --metrics results/metrics.json --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml

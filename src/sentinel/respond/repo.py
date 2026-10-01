@@ -76,6 +76,8 @@ class MemoryRepo:
             "first_event_ts": det.timestamp_event,
             "responded_ts": None,
             "explanation": det.explanation,
+            "attack_id": det.attack_id,
+            "detected_at": det.timestamp_detected,
         }
         self._next_id += 1
         self.incidents[key] = row

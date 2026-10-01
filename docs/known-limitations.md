@@ -51,3 +51,19 @@
   fires on CIC-style flows (used in evaluation), not on generated traffic.
 - Latency numbers quoted during development came from single informal runs; the official figures are produced
   by `python -m sentinel.eval.evaluate` (T6).
+
+## API and evaluation (T6)
+- **Evaluation scenarios are small samples.** A 60 s run at 1,000 events/s contains few campaigns of the
+  slow, large scenarios (1 DoS, 2 port-scan and 5 credential-stuffing campaigns), so a recall of 1.00 there is
+  weak evidence. The per-scenario table always shows the campaign counts for this reason.
+- **Endpoint scenarios count as "no rule yet"** until T11; overall campaign recall is computed over the
+  covered scenarios only and the uncovered ones are listed next to it.
+- **"Time to detect" includes rule accumulation time.** It runs from the first event of a campaign to the first
+  alert, so a threshold rule (for example 150 requests in 10 s) cannot beat its own threshold. The pipeline's
+  own speed is reported separately as latency per detection.
+- **Latencies come from one machine** where the generator, Kafka, Redis, Postgres and the service share
+  16 GB and one CPU. They say nothing about a distributed deployment.
+- **API:** tokens cannot be revoked individually before they expire (disabling or demoting the user does take
+  effect on the next request); login throttling is per source IP and per username and keys off the socket
+  address, so behind a proxy it would need a trusted forwarded-for setting; the API speaks plain HTTP until
+  TLS is added in T21.

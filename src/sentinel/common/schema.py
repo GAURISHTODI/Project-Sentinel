@@ -67,6 +67,7 @@ class NormalizedEvent(BaseModel):
     parent_process: str | None = None
     command_line: str | None = None
     label: str | None = None  # evaluation only
+    campaign: str | None = None  # evaluation only: which attack campaign this event belongs to
 
     @field_validator(*MAX_LEN, mode="before")
     @classmethod
@@ -77,8 +78,8 @@ class NormalizedEvent(BaseModel):
         return v
 
     def strip_label(self) -> NormalizedEvent:
-        """Copy with the evaluation label removed; the detection path only ever sees this."""
-        return self.model_copy(update={"label": None})
+        """Copy without evaluation-only fields; the detection path only ever sees this."""
+        return self.model_copy(update={"label": None, "campaign": None})
 
 
 class Detection(BaseModel):

@@ -64,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
             counts[ev.label or "unlabeled"] += 1
             emit(ev)
     close()
-    elapsed = time.time() - t0
+    elapsed = max(time.time() - t0, 1e-6)  # the clock can read 0 on a very fast run
     total = sum(counts.values())
     print(f"emitted {total} events in {elapsed:.1f}s ({total / elapsed:.0f} eps)", file=sys.stderr)
     for label, n in counts.most_common():

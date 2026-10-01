@@ -57,16 +57,23 @@ class Generator:
         self.world = World(seed=seed)
         self.mix = mix or dict(DEFAULT_MIX)
         self.concurrent = concurrent
-        self._active: list[Iterator[NormalizedEvent]] = []
+        self._active: list[tuple[str, Iterator[NormalizedEvent]]] = []
+        self._campaigns = 0
 
     def _next_attack(self, slot: int) -> NormalizedEvent:
         while True:
             while len(self._active) < self.concurrent:
                 name = self.rng.choices(list(self.mix), weights=list(self.mix.values()))[0]
-                self._active.append(ATTACKS[name](self.rng, self.world))
+                self._campaigns += 1
+                self._active.append(
+                    (f"c{self._campaigns:05d}", ATTACKS[name](self.rng, self.world))
+                )
             i = slot % len(self._active)
+            campaign, it = self._active[i]
             try:
-                return next(self._active[i])
+                ev = next(it)
+                ev.campaign = campaign
+                return ev
             except StopIteration:
                 self._active.pop(i)
 
