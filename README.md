@@ -32,7 +32,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T5 Detection engine + response (rules + ML, policy YAML, 5 idempotent actions, hash-chained audit log; live Kafka/Redis/Postgres demo run)
 - [x] T6 API (JWT + RBAC) + evaluation harness (live and in-process) + CI workflow
 - [x] T7 Vulnerable target (v1 vulnerable + v2 fixed twin, Kafka logs, normalizer, isolated lab network; 34 JUnit tests)
-- [ ] T8 Spring Boot responder gateway
+- [x] T8 Spring Boot responder gateway (blocklist 403, rate limit 429, JWT/RBAC, path-normalised proxy; 61 JUnit tests; live block demo)
 - [ ] T9 Attack lab
 - [ ] T10 OWASP findings + fixes
 - [ ] T11 Endpoint source

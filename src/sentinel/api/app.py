@@ -169,7 +169,7 @@ def create_app(deps: Deps) -> FastAPI:
             )
             raise HTTPException(401, "invalid username or password")
         deps.r.delete(keys[1])
-        token = create_token(user.username, deps.jwt_secret, deps.jwt_ttl_minutes)
+        token = create_token(user.username, deps.jwt_secret, deps.jwt_ttl_minutes, role=user.role)
         return TokenResponse(
             access_token=token, expires_in=deps.jwt_ttl_minutes * 60, role=user.role
         )

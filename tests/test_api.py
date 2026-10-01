@@ -82,8 +82,10 @@ def test_password_hashing() -> None:
 
 
 def test_token_roundtrip_and_rejections() -> None:
-    tok = create_token("alice", SECRET, 5)
-    assert decode_token(tok, SECRET)["sub"] == "alice"
+    tok = create_token("alice", SECRET, 5, role="analyst")
+    claims = decode_token(tok, SECRET)
+    assert claims["sub"] == "alice" and claims["role"] == "analyst"
+    assert "role" not in decode_token(create_token("alice", SECRET, 5), SECRET)
     with pytest.raises(jwt.PyJWTError):
         decode_token(tok, "a-different-secret-" + "y" * 32)
     with pytest.raises(jwt.ExpiredSignatureError):

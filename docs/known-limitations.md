@@ -79,3 +79,19 @@
   localhost, so the log is never completely idle (and localhost is a protected address, never blocked).
 - **Direct attacks bypass nothing yet:** until the gateway (T8) exists, nothing enforces Sentinel's blocks in
   front of the shop; blocks are recorded in Redis only.
+
+## Responder gateway (T8)
+- **Fixed one-minute window.** The rate limiter counts requests per calendar minute, so a client can send up
+  to twice the limit across a minute boundary. Fine for coarse abuse control, not for precise quotas.
+- **Dynamic limits can only tighten.** A Sentinel `sen:ratelimit:<ip>` value above the gateway default is
+  ignored, so a corrupt or malicious Redis value can never loosen the limit.
+- **Fail-open by default.** If Redis is unreachable the gateway keeps serving (counted in `storeErrors`)
+  so a Redis outage is not a site outage; `GATEWAY_FAIL_OPEN=false` switches to answering 503.
+- **Client address.** The gateway trusts only the TCP peer address and discards client-supplied
+  X-Forwarded-For. Behind another proxy or cloud load balancer that address would be the proxy's, so a trusted
+  forwarded-header setting would be needed first.
+- **Two credentials on admin routes.** `/admin/**` needs a Sentinel JWT in `X-Sentinel-Token` (checked at the
+  gateway) in addition to the shop's own session token (checked by the shop).
+- **JWT roles are not re-checked at the gateway.** A token carries its role until it expires (30 minutes by
+  default); the Python API re-reads roles per request, the gateway cannot without a database lookup.
+- **Plain HTTP between gateway and shop** until TLS arrives in T21; both are on an internal network.

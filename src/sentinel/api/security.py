@@ -51,10 +51,14 @@ def dummy_verify(password: str) -> None:
     verify_password(password, _DUMMY)
 
 
-def create_token(username: str, secret: str, ttl_minutes: int, now: float | None = None) -> str:
+def create_token(
+    username: str, secret: str, ttl_minutes: int, now: float | None = None, role: str | None = None
+) -> str:
     if len(secret) < MIN_SECRET_LEN:
         raise ValueError("JWT secret too short")
     t = int(now if now is not None else time.time())
+    # `role` is informational for the Java gateway (which enforces RBAC at the edge). The Python API
+    # ignores it and re-reads the role from the user store on every request.
     claims = {
         "iss": ISSUER,
         "sub": username,
@@ -62,6 +66,8 @@ def create_token(username: str, secret: str, ttl_minutes: int, now: float | None
         "exp": t + ttl_minutes * 60,
         "jti": uuid.uuid4().hex,
     }
+    if role is not None:
+        claims["role"] = role
     return jwt.encode(claims, secret, algorithm=ALGORITHM)
 
 

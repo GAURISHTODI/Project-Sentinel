@@ -47,3 +47,5 @@ jobs:
           cache: maven
       - name: target-shop (v1 exploitable, v2 fixed)
         run: mvn -q -B -f target-shop/pom.xml test
+      - name: responder gateway (blocklist, rate limit, JWT/RBAC, path-bypass attempts)
+        run: mvn -q -B -f responder/pom.xml test
