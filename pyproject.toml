@@ -54,6 +54,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = ["integration: needs the docker compose core stack (Redis/Kafka/Postgres)"]
 
 [tool.ruff]
 line-length = 100

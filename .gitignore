@@ -20,8 +20,8 @@ htmlcov/
 data/*
 !data/.gitkeep
 mlruns/
-models/*.joblib
-models/*.pt
+models/**/*.joblib
+models/**/*.pt
 
 # java
 target/

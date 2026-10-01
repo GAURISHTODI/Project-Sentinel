@@ -26,8 +26,8 @@ Sentinel ingests logs from four sources, detects attacks with ATT&CK-mapped rule
 A feature is ticked only when its code, tests and a working demo exist.
 
 - [x] T1 Scaffold + infra (Kafka KRaft, Redis, PostgreSQL, compose profiles)
-- [ ] T2 Schema + generator (code, 20 tests and JSONL demo done; live Kafka publish demo pending Docker)
-- [x] T3 Rule engine (SEN-001..009; Redis state tested on fakeredis, real-Redis check pending Docker)
+- [x] T2 Schema + generator (20 tests; live Kafka publish and round trip verified)
+- [x] T3 Rule engine (SEN-001..009; verified on real Redis)
 - [ ] T4 Network ML
 - [ ] T5 Detection engine + response
 - [ ] T6 API + evaluation harness

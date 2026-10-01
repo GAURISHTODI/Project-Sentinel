@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    kafka_bootstrap: str = "localhost:29092"
+    kafka_bootstrap: str = "127.0.0.1:29092"
     events_topic: str = "events.normalized"
     detections_topic: str = "detections"
     redis_url: SecretStr = Field(default=SecretStr("redis://localhost:6379/0"))
