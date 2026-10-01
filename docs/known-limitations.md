@@ -95,3 +95,24 @@
 - **JWT roles are not re-checked at the gateway.** A token carries its role until it expires (30 minutes by
   default); the Python API re-reads roles per request, the gateway cannot without a database lookup.
 - **Plain HTTP between gateway and shop** until TLS arrives in T21; both are on an internal network.
+
+## Attack lab (T9)
+- **SEN-004 (port scan) does not fire on real Nmap traffic against target-shop.** The shop exposes exactly
+  one TCP port; a full port scan's probes against the other 65,534 ports are rejected at the kernel/TCP
+  layer and never reach any component Sentinel can observe. Only Nmap's HTTP-layer NSE scripts (service/
+  title detection) are visible, and those correctly trip SEN-005 (scanner user-agent). Real network-level
+  port-scan detection needs packet capture, which is T12's job.
+- **Hydra needs the `1=` http-post-form option.** target-shop returns a genuine HTTP 401 for bad credentials
+  (correct REST behaviour), but Hydra's default heuristic treats any 401 as "this is HTTP Basic Auth, not a
+  form" and refuses to process attempts, silently retrying forever instead of counting them as failures.
+  `lab/03_hydra.sh` passes `1=` to tell Hydra to treat 401 as a normal form failure.
+- **A source that gets blocklisted stays blocked for later, unrelated attacks from the same IP.** This is
+  correct behaviour (the whole point of the blocklist), but it means a later lab script run from a
+  previously-flagged attack container will be refused at the gateway (403) before it can demonstrate its own
+  specific detection. Clear `sen:blocklist:<ip>` in Redis between isolated single-technique demonstrations.
+- **The `lab` network has no internet egress once a tool container joins it** (`internal: true`). Tool images
+  must be pulled or built before they are run with `--network lab`; ZAP in particular never reaches its own
+  update servers at scan time and runs entirely on its image's bundled rule set.
+- **ZAP's active scan (`zap-full-scan.py`) independently rediscovered real SQLi and XSS** using its own
+  payloads (not reused from our test suite), and that traffic correctly tripped SEN-002, SEN-003, SEN-007 and
+  SEN-009 live through the real pipeline — useful independent corroboration for the OWASP findings in T10.

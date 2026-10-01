@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 7.98 scan initiated Thu Oct  1 18:32:52 2026 as: /usr/bin/nmap -sV -sC -p- -&#45;min-rate 500 -T4 -oN /out/nmap_20261002T000252.txt -oX /out/nmap_20261002T000252.xml 172.30.0.11 -->
+<nmaprun scanner="nmap" args="/usr/bin/nmap -sV -sC -p- -&#45;min-rate 500 -T4 -oN /out/nmap_20261002T000252.txt -oX /out/nmap_20261002T000252.xml 172.30.0.11" start="1790879572" startstr="Thu Oct  1 18:32:52 2026" version="7.98" xmloutputversion="1.05">
+<scaninfo type="syn" protocol="tcp" numservices="65535" services="1-65535"/>
+<verbose level="0"/>
+<debugging level="0"/>
+<hosthint><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.30.0.11" addrtype="ipv4"/>
+<address addr="32:CF:BB:68:B7:35" addrtype="mac"/>
+<hostnames>
+</hostnames>
+</hosthint>
+<host starttime="1790879573" endtime="1790879579"><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="172.30.0.11" addrtype="ipv4"/>
+<address addr="32:CF:BB:68:B7:35" addrtype="mac"/>
+<hostnames>
+<hostname name="sentinel-target-shop-1.lab" type="PTR"/>
+</hostnames>
+<ports><extraports state="closed" count="65534">
+<extrareasons reason="reset" count="65534" proto="tcp" ports="1-8079,8081-65535"/>
+</extraports>
+<port protocol="tcp" portid="8080"><state state="open" reason="syn-ack" reason_ttl="64"/><service name="http" product="Apache Tomcat" extrainfo="language: en" method="probed" conf="10"><cpe>cpe:/a:apache:tomcat</cpe></service><script id="http-open-proxy" output="Proxy might be redirecting requests"/><script id="http-title" output="Sentinel Shop (v1)"><elem key="title">Sentinel Shop (v1)</elem>
+</script></port>
+</ports>
+<times srtt="7" rttvar="0" to="100000"/>
+</host>
+<runstats><finished time="1790879580" timestr="Thu Oct  1 18:33:00 2026" summary="Nmap done at Thu Oct  1 18:33:00 2026; 1 IP address (1 host up) scanned in 7.27 seconds" elapsed="7.27" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>
