@@ -72,14 +72,19 @@ def eval_binary(pipe: Pipeline, X: pd.DataFrame, y_attack: np.ndarray[Any, Any])
         "false_negative_rate": float(fn / max(fn + tp, 1)),
         "roc_auc": float(roc_auc_score(y_attack, prob)),
         "pr_auc": float(average_precision_score(y_attack, prob)),
-        "confusion_matrix": {"labels": ["benign", "attack"], "matrix": [[int(tn), int(fp)], [int(fn), int(tp)]]},
+        "confusion_matrix": {
+            "labels": ["benign", "attack"],
+            "matrix": [[int(tn), int(fp)], [int(fn), int(tp)]],
+        },
         "threshold": 0.5,
         "n_test": int(len(y_attack)),
         "report": rep,
     }  # fmt: skip
 
 
-def eval_multi(pipe: Pipeline, X: pd.DataFrame, y_enc: np.ndarray[Any, Any], classes: list[str]) -> dict[str, Any]:
+def eval_multi(
+    pipe: Pipeline, X: pd.DataFrame, y_enc: np.ndarray[Any, Any], classes: list[str]
+) -> dict[str, Any]:
     pred = pipe.predict(X)
     labels = list(range(len(classes)))
     rep = classification_report(
@@ -112,7 +117,7 @@ def _plot_cm(cm: list[list[int]], labels: list[str], title: str, path: Path) -> 
     for i in range(len(labels)):
         for j in range(len(labels)):
             if arr[i, j]:
-                ax.text(j, i, int(arr[i, j]), ha="center", va="center", fontsize=6,
+                ax.text(j, i, str(int(arr[i, j])), ha="center", va="center", fontsize=6,
                         color="white" if norm[i, j] > 0.5 else "black")  # fmt: skip
     ax.set_xlabel("predicted")
     ax.set_ylabel("true")
@@ -150,7 +155,7 @@ def train(
     ya_tr = (y_tr != BENIGN).astype(int).to_numpy()
     ya_te = (y_te != BENIGN).astype(int).to_numpy()
 
-    # multi-class: only classes with enough TRAIN rows to learn from; the rest are reported, not hidden
+    # multi-class: only classes with enough TRAIN rows; the rest are reported, not hidden
     support = y_tr.value_counts()
     kept = sorted(c for c in support.index if support[c] >= min_multi_support)
     skipped = {str(c): int(support[c]) for c in support.index if c not in kept}
@@ -175,10 +180,13 @@ def train(
     results["xgb_multi"]["classes_not_trained"] = skipped
     train_seconds = round(time.time() - t0, 1)
 
+    multi_classes = [str(c) for c in enc.classes_]
+    classes_of = {"rf_binary": ["benign", "attack"], "xgb_binary": ["benign", "attack"],
+                  "xgb_multi": multi_classes}  # fmt: skip
     for name, pipe in fitted.items():
         joblib.dump(
             {"pipeline": pipe, "features": features,
-             "classes": [str(c) for c in enc.classes_] if name == "xgb_multi" else ["benign", "attack"]},
+             "classes": classes_of[name]},
             out_dir / f"{name}.joblib", compress=3,
         )  # fmt: skip
 
@@ -193,8 +201,11 @@ def train(
         "sample_size": int(len(df)),
         "seed": seed,
         "split": {
-            "test_size": 0.2, "stratified_on": "class label", "train_rows": int(len(X_tr)),
-            "test_rows": int(len(X_te)), "scaler_fit_on": "train split only",
+            "test_size": 0.2,
+            "stratified_on": "class label",
+            "train_rows": int(len(X_tr)),
+            "test_rows": int(len(X_te)),
+            "scaler_fit_on": "train split only",
             "train_label_counts": {str(k): int(v) for k, v in y_tr.value_counts().items()},
             "test_label_counts": {str(k): int(v) for k, v in y_te.value_counts().items()},
         },  # fmt: skip
@@ -217,7 +228,9 @@ def train(
     (out_dir / "model_card.json").write_text(json.dumps(card, indent=2), encoding="utf-8")
     if results_dir is not None:
         results_dir.mkdir(parents=True, exist_ok=True)
-        (results_dir / "network.json").write_text(json.dumps(card["metrics"], indent=2), encoding="utf-8")
+        (results_dir / "network.json").write_text(
+            json.dumps(card["metrics"], indent=2), encoding="utf-8"
+        )
     if plots_dir is not None:
         for name in ("rf_binary", "xgb_binary", "xgb_multi"):
             cm = results[name]["confusion_matrix"]
@@ -227,15 +240,19 @@ def train(
     return {"card": card, "results": results}
 
 
-def _log_mlflow(uri: str, card: dict[str, Any], results: dict[str, Any], out_dir: Path, seed: int) -> None:
+def _log_mlflow(
+    uri: str, card: dict[str, Any], results: dict[str, Any], out_dir: Path, seed: int
+) -> None:
     import mlflow
 
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment("sentinel-network-ids")
     for name, res in results.items():
         with mlflow.start_run(run_name=name):
-            mlflow.log_params({"model": name, "seed": seed, "sample_size": card["sample_size"],
-                               **{k: v for k, v in card["models"][name].items() if k != "classes"}})  # fmt: skip
+            model_params = {k: v for k, v in card["models"][name].items() if k != "classes"}
+            mlflow.log_params(
+                {"model": name, "seed": seed, "sample_size": card["sample_size"], **model_params}
+            )
             mlflow.log_metrics({k: v for k, v in res.items() if isinstance(v, float)})
             mlflow.log_artifact(str(out_dir / "model_card.json"))
 
@@ -265,16 +282,28 @@ def main(argv: list[str] | None = None) -> int:
     )  # fmt: skip
     for name in ("rf_binary", "xgb_binary"):
         r = out["results"][name]
-        print(f"\n=== {name} ===  F1={r['f1']:.4f} precision={r['precision']:.4f} recall={r['recall']:.4f} "
-              f"FPR={r['false_positive_rate']:.4f} ROC-AUC={r['roc_auc']:.4f} PR-AUC={r['pr_auc']:.4f}")  # fmt: skip
+        print(
+            f"\n=== {name} ===  F1={r['f1']:.4f} precision={r['precision']:.4f} "
+            f"recall={r['recall']:.4f} FPR={r['false_positive_rate']:.4f} "
+            f"ROC-AUC={r['roc_auc']:.4f} PR-AUC={r['pr_auc']:.4f}"
+        )
         _print_cm(name, r)
     m = out["results"]["xgb_multi"]
-    print(f"\n=== xgb_multi ===  macro-F1={m['macro_f1']:.4f} weighted-F1={m['weighted_f1']:.4f} accuracy={m['accuracy']:.4f}")
+    print(
+        f"\n=== xgb_multi ===  macro-F1={m['macro_f1']:.4f} "
+        f"weighted-F1={m['weighted_f1']:.4f} accuracy={m['accuracy']:.4f}"
+    )
     print(f"{'class':28s}{'precision':>10s}{'recall':>8s}{'f1':>8s}{'support':>9s}")
     for cls, s in m["per_class"].items():
-        print(f"{cls:28s}{s['precision']:10.3f}{s['recall']:8.3f}{s['f1-score']:8.3f}{int(s['support']):9d}")
+        print(
+            f"{cls:28s}{s['precision']:10.3f}{s['recall']:8.3f}"
+            f"{s['f1-score']:8.3f}{int(s['support']):9d}"
+        )
     if m["classes_not_trained"]:
-        print("classes with too few training rows, not in the multi-class model:", m["classes_not_trained"])
+        print(
+            "classes with too few training rows, not in the multi-class model:",
+            m["classes_not_trained"],
+        )
     print(f"\nmodel card: {a.out / 'model_card.json'}   total {time.time() - t0:.0f}s")
     return 0
 

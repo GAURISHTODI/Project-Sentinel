@@ -10,6 +10,7 @@ from typing import Any
 
 import joblib
 import numpy as np
+import pandas as pd
 
 DEFAULT_DIR = Path("models/network")
 MIN_FEATURE_COVERAGE = 0.8  # refuse to score a flow that is mostly missing features
@@ -30,7 +31,7 @@ class NetworkPredictor:
         card = model_dir / "model_card.json"
         self.card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
 
-    def _vector(self, flow: Mapping[str, float]) -> np.ndarray[Any, Any]:
+    def _vector(self, flow: Mapping[str, float]) -> pd.DataFrame:
         present = [f for f in self.features if f in flow]
         if len(present) < MIN_FEATURE_COVERAGE * len(self.features):
             raise ValueError(f"flow has {len(present)}/{len(self.features)} required features")
@@ -40,7 +41,7 @@ class NetworkPredictor:
             # untrusted: ignore non-numeric, NaN and infinite values (treated as 0)
             if isinstance(v, int | float) and not isinstance(v, bool) and math.isfinite(v):
                 vec[0, i] = v
-        return vec
+        return pd.DataFrame(vec, columns=self.features)
 
     def attack_probability(self, flow: Mapping[str, float]) -> float:
         """P(attack) for a binary model."""

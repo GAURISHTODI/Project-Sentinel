@@ -1,0 +1,360 @@
+{
+  "rf_binary": {
+    "precision": 0.996937212863706,
+    "recall": 0.9937552039966694,
+    "f1": 0.9953436652998818,
+    "false_positive_rate": 0.000685422313611864,
+    "false_negative_rate": 0.0062447960033305576,
+    "roc_auc": 0.9999210280494204,
+    "pr_auc": 0.9996625644535296,
+    "confusion_matrix": {
+      "labels": [
+        "benign",
+        "attack"
+      ],
+      "matrix": [
+        [
+          32075,
+          22
+        ],
+        [
+          45,
+          7161
+        ]
+      ]
+    },
+    "threshold": 0.5,
+    "n_test": 39303
+  },
+  "xgb_binary": {
+    "precision": 0.9962577962577963,
+    "recall": 0.9975020815986678,
+    "f1": 0.9968795506552943,
+    "false_positive_rate": 0.000841200112160015,
+    "false_negative_rate": 0.002497918401332223,
+    "roc_auc": 0.9999558413392875,
+    "pr_auc": 0.9998042430849984,
+    "confusion_matrix": {
+      "labels": [
+        "benign",
+        "attack"
+      ],
+      "matrix": [
+        [
+          32070,
+          27
+        ],
+        [
+          18,
+          7188
+        ]
+      ]
+    },
+    "threshold": 0.5,
+    "n_test": 39303
+  },
+  "xgb_multi": {
+    "macro_f1": 0.8898450157674375,
+    "weighted_f1": 0.9982845586708882,
+    "accuracy": 0.9983204824795786,
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.999501324606514,
+        "recall": 0.9991276443281304,
+        "f1-score": 0.9993144495341373,
+        "support": 32097.0
+      },
+      "Bot": {
+        "precision": 0.7727272727272727,
+        "recall": 0.6071428571428571,
+        "f1-score": 0.68,
+        "support": 28.0
+      },
+      "DDoS": {
+        "precision": 1.0,
+        "recall": 0.9994472084024323,
+        "f1-score": 0.9997235277854576,
+        "support": 1809.0
+      },
+      "DoS GoldenEye": {
+        "precision": 1.0,
+        "recall": 0.9863013698630136,
+        "f1-score": 0.993103448275862,
+        "support": 146.0
+      },
+      "DoS Hulk": {
+        "precision": 0.9977994341402074,
+        "recall": 0.9996850393700787,
+        "f1-score": 0.9987413467589679,
+        "support": 3175.0
+      },
+      "DoS Slowhttptest": {
+        "precision": 0.9746835443037974,
+        "recall": 0.9871794871794872,
+        "f1-score": 0.9808917197452229,
+        "support": 78.0
+      },
+      "DoS slowloris": {
+        "precision": 0.9878048780487805,
+        "recall": 0.9878048780487805,
+        "f1-score": 0.9878048780487805,
+        "support": 82.0
+      },
+      "FTP-Patator": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 109.0
+      },
+      "Infiltration": {
+        "precision": 1.0,
+        "recall": 0.7142857142857143,
+        "f1-score": 0.8333333333333334,
+        "support": 7.0
+      },
+      "PortScan": {
+        "precision": 0.98989898989899,
+        "recall": 1.0,
+        "f1-score": 0.9949238578680203,
+        "support": 1666.0
+      },
+      "SSH-Patator": {
+        "precision": 1.0,
+        "recall": 0.9830508474576272,
+        "f1-score": 0.9914529914529915,
+        "support": 59.0
+      },
+      "Web Attack Brute Force": {
+        "precision": 0.6,
+        "recall": 0.42857142857142855,
+        "f1-score": 0.5,
+        "support": 21.0
+      },
+      "Web Attack XSS": {
+        "precision": 0.5384615384615384,
+        "recall": 0.7,
+        "f1-score": 0.6086956521739131,
+        "support": 20.0
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "BENIGN",
+        "Bot",
+        "DDoS",
+        "DoS GoldenEye",
+        "DoS Hulk",
+        "DoS Slowhttptest",
+        "DoS slowloris",
+        "FTP-Patator",
+        "Infiltration",
+        "PortScan",
+        "SSH-Patator",
+        "Web Attack Brute Force",
+        "Web Attack XSS"
+      ],
+      "matrix": [
+        [
+          32069,
+          5,
+          0,
+          0,
+          6,
+          0,
+          0,
+          0,
+          0,
+          17,
+          0,
+          0,
+          0
+        ],
+        [
+          11,
+          17,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1808,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          144,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          3174,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          77,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          81,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          109,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1666,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          58,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9,
+          12
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6,
+          14
+        ]
+      ]
+    },
+    "n_test": 39297,
+    "classes_not_trained": {
+      "Web Attack SQL Injection": 17,
+      "Heartbleed": 9
+    }
+  }
+}

@@ -28,7 +28,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T1 Scaffold + infra (Kafka KRaft, Redis, PostgreSQL, compose profiles)
 - [x] T2 Schema + generator (20 tests; live Kafka publish and round trip verified)
 - [x] T3 Rule engine (SEN-001..009; verified on real Redis)
-- [ ] T4 Network ML
+- [x] T4 Network ML (RF + XGBoost binary, XGBoost multi-class, MLflow, model card; metrics TBD in README until T6)
 - [ ] T5 Detection engine + response
 - [ ] T6 API + evaluation harness
 - [ ] T7 Vulnerable target

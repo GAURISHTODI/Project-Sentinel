@@ -28,11 +28,17 @@ CREATE TABLE IF NOT EXISTS incidents (
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     CHECK (rule_id IS NOT NULL OR model_name IS NOT NULL)
 );
+-- alert grouping: one OPEN incident per (detector, entity, hour); repeats bump event_count
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS dedupe_key  TEXT;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS event_count INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS last_seen   TIMESTAMPTZ;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS first_event_ts DOUBLE PRECISION;
+ALTER TABLE incidents ADD COLUMN IF NOT EXISTS responded_ts   DOUBLE PRECISION;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_incident_open_key
+    ON incidents (dedupe_key) WHERE status = 'open';
 CREATE INDEX IF NOT EXISTS idx_incidents_src_ip ON incidents (src_ip);
 CREATE INDEX IF NOT EXISTS idx_incidents_status ON incidents (status);
--- one incident per (event, detector): makes create_incident idempotent
-CREATE UNIQUE INDEX IF NOT EXISTS uq_incident_event_detector
-    ON incidents (event_id, COALESCE(rule_id, model_name));
+DROP INDEX IF EXISTS uq_incident_event_detector;
 
 CREATE TABLE IF NOT EXISTS locked_accounts (
     username   TEXT PRIMARY KEY,

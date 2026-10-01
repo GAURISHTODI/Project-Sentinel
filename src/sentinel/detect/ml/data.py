@@ -56,7 +56,7 @@ def _read(path: Path) -> pd.DataFrame:
     """Read one CSV with float32 features. latin-1 because some labels are not valid UTF-8."""
     header = pd.read_csv(path, nrows=0, encoding="latin-1").columns
     dtypes = {c: np.float32 for c in header if c.strip() != LABEL}
-    df = pd.read_csv(path, dtype=dtypes, encoding="latin-1")  # type: ignore[arg-type]
+    df = pd.read_csv(path, dtype=dtypes, encoding="latin-1")
     df.columns = [c.strip() for c in df.columns]
     df[LABEL] = df[LABEL].astype(str).map(normalize_label)
     return df

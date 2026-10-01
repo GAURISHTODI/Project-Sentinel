@@ -39,3 +39,5 @@ target/
 # raw datasets (large, downloaded locally)
 archive/
 .kilo/
+mlflow.db
+mlruns/
