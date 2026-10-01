@@ -182,6 +182,14 @@ class V2FixesTest {
     }
 
     @Test
+    void formEncodedLoginIsAlsoProtected() throws Exception {
+        assertThat(mvc.perform(post("/api/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", "admin'--").param("password", "x")).andReturn().getResponse().getStatus()).isEqualTo(401);
+        assertThat(mvc.perform(post("/api/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", "alice").param("password", "sunshine")).andReturn().getResponse().getStatus()).isEqualTo(200);
+    }
+
+    @Test
     void unknownRoutesAre404WithoutDetail() throws Exception {
         MvcResult r = mvc.perform(get("/.env")).andReturn();
         assertThat(r.getResponse().getStatus()).isEqualTo(404);

@@ -7,11 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,7 +38,16 @@ public class AuthController {
         this.events = events;
     }
 
-    @PostMapping("/api/login")
+    /** The same login for a plain HTML form (application/x-www-form-urlencoded). */
+    @PostMapping(value = "/api/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Map<String, Object>> loginForm(
+            @RequestParam(defaultValue = "") String username,
+            @RequestParam(defaultValue = "") String password,
+            HttpServletRequest http) {
+        return login(new LoginRequest(username, password), http);
+    }
+
+    @PostMapping(value = "/api/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest req, HttpServletRequest http) {
         String ip = ClientIp.resolve(http, props);
         String username = req.username() == null ? "" : req.username();

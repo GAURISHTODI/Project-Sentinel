@@ -146,6 +146,18 @@ class V1VulnerabilitiesTest {
     }
 
     @Test
+    void formEncodedLoginWorksAndIsEquallyInjectable() throws Exception {
+        MvcResult ok = mvc.perform(post("/api/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", "alice").param("password", "sunshine")).andReturn();
+        assertThat(ok.getResponse().getStatus()).isEqualTo(200);
+        MvcResult inj = mvc.perform(post("/api/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", "admin'--").param("password", "x")).andReturn();
+        assertThat(JSON.readTree(body(inj)).get("role").asText()).isEqualTo("admin");
+        assertThat(mvc.perform(post("/api/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", "alice").param("password", "no")).andReturn().getResponse().getStatus()).isEqualTo(401);
+    }
+
+    @Test
     void unknownRoutesAre404NotServerErrors() throws Exception {
         assertThat(mvc.perform(get("/.env")).andReturn().getResponse().getStatus()).isEqualTo(404);
     }
