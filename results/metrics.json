@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-01T17:48:17+00:00",
-  "git_commit": "2772cf1",
+  "generated_at": "2026-10-02T12:02:03+00:00",
+  "git_commit": "aab6ddd+dirty",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -12,23 +12,23 @@
     "events": 60000,
     "attack_events": 6000,
     "campaigns": 448,
-    "detections": 1747,
+    "detections": 2617,
     "scenarios": {
       "endpoint_service": {
         "campaigns": 210,
         "events": 210,
-        "detected_any": 0,
-        "detected_expected": 0,
-        "covered": false,
-        "recall_expected_rule": 0.0
+        "detected_any": 210,
+        "detected_expected": 210,
+        "covered": true,
+        "recall_expected_rule": 1.0
       },
       "endpoint_powershell": {
         "campaigns": 56,
         "events": 228,
-        "detected_any": 0,
-        "detected_expected": 0,
-        "covered": false,
-        "recall_expected_rule": 0.0
+        "detected_any": 56,
+        "detected_expected": 56,
+        "covered": true,
+        "recall_expected_rule": 1.0
       },
       "sqli": {
         "campaigns": 12,
@@ -51,10 +51,10 @@
       "endpoint_spawn": {
         "campaigns": 64,
         "events": 204,
-        "detected_any": 0,
-        "detected_expected": 0,
-        "covered": false,
-        "recall_expected_rule": 0.0
+        "detected_any": 64,
+        "detected_expected": 64,
+        "covered": true,
+        "recall_expected_rule": 1.0
       },
       "valid_account_abuse": {
         "campaigns": 43,
@@ -120,6 +120,9 @@
         "brute_force",
         "credential_stuffing",
         "dos",
+        "endpoint_powershell",
+        "endpoint_service",
+        "endpoint_spawn",
         "path_traversal",
         "port_scan",
         "scanner",
@@ -127,13 +130,9 @@
         "valid_account_abuse",
         "xss"
       ],
-      "uncovered_scenarios": [
-        "endpoint_powershell",
-        "endpoint_service",
-        "endpoint_spawn"
-      ],
-      "campaigns_covered": 118,
-      "campaign_recall_expected_rule": 0.9068
+      "uncovered_scenarios": [],
+      "campaigns_covered": 448,
+      "campaign_recall_expected_rule": 0.9754
     },
     "per_rule": {
       "SEN-001": {
@@ -216,6 +215,33 @@
         "campaigns": 15,
         "campaigns_detected": 15,
         "campaign_recall": 1.0
+      },
+      "SEN-010": {
+        "detections": 432,
+        "true_positive_detections": 204,
+        "false_positive_detections": 228,
+        "precision": 0.4722,
+        "campaigns": 64,
+        "campaigns_detected": 64,
+        "campaign_recall": 1.0
+      },
+      "SEN-011": {
+        "detections": 228,
+        "true_positive_detections": 228,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 56,
+        "campaigns_detected": 56,
+        "campaign_recall": 1.0
+      },
+      "SEN-012": {
+        "detections": 210,
+        "true_positive_detections": 210,
+        "false_positive_detections": 0,
+        "precision": 1.0,
+        "campaigns": 210,
+        "campaigns_detected": 210,
+        "campaign_recall": 1.0
       }
     },
     "false_positives": {
@@ -238,6 +264,9 @@
         "SEN-007",
         "SEN-008",
         "SEN-009",
+        "SEN-010",
+        "SEN-011",
+        "SEN-012",
         "none"
       ],
       "rows": {
@@ -251,7 +280,10 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
-          "none": 210
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 210,
+          "none": 0
         },
         "endpoint_powershell": {
           "SEN-001": 0,
@@ -263,7 +295,10 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
-          "none": 56
+          "SEN-010": 0,
+          "SEN-011": 56,
+          "SEN-012": 0,
+          "none": 0
         },
         "sqli": {
           "SEN-001": 0,
@@ -275,6 +310,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "path_traversal": {
@@ -287,6 +325,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 15,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "endpoint_spawn": {
@@ -299,7 +340,10 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
-          "none": 64
+          "SEN-010": 64,
+          "SEN-011": 0,
+          "SEN-012": 0,
+          "none": 0
         },
         "valid_account_abuse": {
           "SEN-001": 0,
@@ -311,6 +355,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 11
         },
         "scanner": {
@@ -323,6 +370,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "xss": {
@@ -335,6 +385,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "brute_force": {
@@ -347,6 +400,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "credential_stuffing": {
@@ -359,6 +415,9 @@
           "SEN-007": 0,
           "SEN-008": 5,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "port_scan": {
@@ -371,6 +430,9 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "dos": {
@@ -383,6 +445,9 @@
           "SEN-007": 1,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 0
         },
         "benign (events)": {
@@ -395,57 +460,63 @@
           "SEN-007": 0,
           "SEN-008": 0,
           "SEN-009": 0,
+          "SEN-010": 0,
+          "SEN-011": 0,
+          "SEN-012": 0,
           "none": 53993
         }
       }
     },
     "latency": {
       "time_to_detect": {
-        "n": 107,
-        "mean_ms": 202.0,
-        "p50_ms": 91.9,
-        "p95_ms": 230.2,
-        "max_ms": 9075.6
+        "n": 437,
+        "mean_ms": 388.0,
+        "p50_ms": 296.1,
+        "p95_ms": 1054.5,
+        "max_ms": 9220.9
       },
       "pipeline_per_detection": {
-        "n": 1747,
-        "mean_ms": 97.8,
-        "p50_ms": 90.7,
-        "p95_ms": 191.8,
-        "max_ms": 276.1
+        "n": 2617,
+        "mean_ms": 341.0,
+        "p50_ms": 268.1,
+        "p95_ms": 929.7,
+        "max_ms": 1531.9
       },
       "time_to_respond": {
-        "n": 70,
-        "mean_ms": 265.7,
-        "p50_ms": 99.4,
-        "p95_ms": 964.4,
-        "max_ms": 9078.3
+        "n": 177,
+        "mean_ms": 449.5,
+        "p50_ms": 320.8,
+        "p95_ms": 1135.6,
+        "max_ms": 9228.4
       },
       "note": null
     },
     "throughput": {
       "events": 60000,
-      "seconds": 59.01,
-      "events_per_second": 1016.7,
+      "seconds": 59.04,
+      "events_per_second": 1016.2,
       "service_events_processed": 60000,
       "service_invalid_dropped": 0
     }
   },
   "rules": {
-    "count": 9,
+    "count": 12,
     "attack_techniques": [
       "T1046",
+      "T1059",
+      "T1059.001",
       "T1078",
       "T1110",
       "T1110.004",
       "T1190",
       "T1499",
+      "T1543",
       "T1595"
     ],
-    "technique_count": 7
+    "technique_count": 10
   },
   "tests": {
-    "python_collected": 144,
+    "python_collected": 193,
     "java_junit": null
   },
   "ml": {

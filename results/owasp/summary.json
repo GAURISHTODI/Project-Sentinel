@@ -1,0 +1,6 @@
+{
+  "v1_open": 14,
+  "v2_open": 0,
+  "junit_tests": 36,
+  "methodology": "docs/owasp-findings.md: F-01..F-14, each re-verified against the real running v2 container with the same attack tool used to find it in v1 (sqlmap, Hydra, ZAP full active scan, or manual request), not only by reading the diff."
+}

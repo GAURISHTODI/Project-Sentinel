@@ -45,7 +45,11 @@ class EventProducer:
 
     def send_model(self, model: BaseModel, key: str) -> None:
         """Publish any pydantic model (e.g. a Detection) as JSON with an explicit partition key."""
-        value = model.model_dump_json().encode()
+        self.send_raw(model.model_dump_json(), key)
+
+    def send_raw(self, payload: str, key: str) -> None:
+        """Publish an already-serialized JSON string (e.g. a raw WinPulse record) with a key."""
+        value = payload.encode()
         try:
             self._p.produce(self.topic, value, key.encode())
         except BufferError:

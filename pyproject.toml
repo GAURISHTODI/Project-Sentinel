@@ -79,3 +79,9 @@ files = ["src"]
 [[tool.mypy.overrides]]
 module = ["confluent_kafka.*", "sklearn.*", "xgboost.*", "mlflow.*", "joblib.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Windows-only, optional at runtime (the exporter degrades gracefully without them); used only by
+# windows/winpulse_exporter.py, which is outside the `files = ["src"]` scope `mypy src` checks.
+module = ["pywintypes.*", "win32evtlog.*"]
+ignore_missing_imports = true

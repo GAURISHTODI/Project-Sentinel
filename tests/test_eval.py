@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pytest
 
+import sentinel.eval.evaluate as evaluate_module
 from sentinel.common.schema import Detection, NormalizedEvent
-from sentinel.eval.evaluate import _parse_counts, main, run_inproc
+from sentinel.eval.evaluate import _parse_counts, collect_sections, main, run_inproc
 from sentinel.eval.metrics import Response, RunData, compute
 
 RULES = {"SEN-001", "SEN-002", "SEN-005"}
@@ -134,6 +135,30 @@ def test_inproc_run_and_metrics_json(tmp_path: Path) -> None:
     assert m["pipeline"]["events"] == 2000 and m["rules"]["count"] >= 9
     assert m["pipeline"]["latency"]["time_to_detect"] is None  # never invented
     assert m["rules"]["technique_count"] == len(m["rules"]["attack_techniques"])
+
+
+def test_collect_sections_nests_ml_by_model_name_but_owasp_is_the_whole_section(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression test: an earlier version unwrapped any single-file directory, which silently
+    collapsed ml/network.json's own keys up a level (breaking dig(m, "ml", "network", ...))."""
+    monkeypatch.setattr(evaluate_module, "RESULTS", tmp_path)
+    (tmp_path / "ml").mkdir()
+    (tmp_path / "ml" / "network.json").write_text(json.dumps({"rf_binary": {"f1": 0.99}}))
+    (tmp_path / "owasp").mkdir()
+    (tmp_path / "owasp" / "summary.json").write_text(json.dumps({"v1_open": 14, "v2_open": 0}))
+
+    out = collect_sections()
+
+    assert out["ml"]["network"]["rf_binary"]["f1"] == 0.99  # nested under the model's own name
+    assert out["owasp"] == {"v1_open": 14, "v2_open": 0}  # the file *is* the section, not nested
+
+
+def test_collect_sections_is_empty_when_no_results_directories_exist(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(evaluate_module, "RESULTS", tmp_path / "does-not-exist")
+    assert collect_sections() == {}
 
 
 def test_run_is_deterministic_for_a_seed() -> None:

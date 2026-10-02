@@ -228,13 +228,26 @@ def _count_tests() -> dict[str, Any]:
 
 
 def collect_sections() -> dict[str, Any]:
-    """Merge results written by training/test scripts: results/ml/*.json -> metrics['ml'][name]."""
+    """Merge results written by other tasks' scripts, so a fresh evaluate.py run never loses them.
+
+    results/ml/*.json         -> metrics['ml'][name]     one file per model (T4/T15/T16/T17);
+                                                          read by name, e.g. dig(m, "ml", "network")
+    results/owasp/summary.json -> metrics['owasp']        one file, the whole section (T10)
+    results/ci/summary.json   -> metrics['ci']           one file, the whole section (T20)
+
+    Anything hand-added directly to metrics.json instead of one of these files is silently
+    discarded the next time this runs -- write the results/<section>/ file instead.
+    """
     out: dict[str, Any] = {}
     ml_dir = RESULTS / "ml"
-    if ml_dir.exists():
+    if ml_dir.exists() and list(ml_dir.glob("*.json")):
         out["ml"] = {
             p.stem: json.loads(p.read_text(encoding="utf-8")) for p in sorted(ml_dir.glob("*.json"))
         }
+    for section in ("owasp", "ci"):
+        summary = RESULTS / section / "summary.json"
+        if summary.exists():
+            out[section] = json.loads(summary.read_text(encoding="utf-8"))
     return out
 
 

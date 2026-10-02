@@ -109,15 +109,15 @@ def rows(m: dict[str, Any]) -> list[tuple[str, str]]:
     inj = dig(m, "injection", "pass_rate")
     out.append(("Prompt-injection suite", f"{inj:.0%} on-schema" if inj is not None else TBD))
     owasp = dig(m, "owasp")
-    out.append(
-        (
-            "OWASP findings, v1 to v2",
+    if owasp:
+        owasp_result = (
             f"{owasp['v1_open']} → {owasp['v2_open']} "
-            f"(re-verified live: sqlmap, Hydra, ZAP full active scan, {owasp['junit_tests']} JUnit tests)"
-            if owasp
-            else TBD,
+            f"(re-verified live: sqlmap, Hydra, ZAP full active scan, "
+            f"{owasp['junit_tests']} JUnit tests)"
         )
-    )
+    else:
+        owasp_result = TBD
+    out.append(("OWASP findings, v1 to v2", owasp_result))
     out.append(("CI security scanners", TBD if dig(m, "ci") is None else str(dig(m, "ci"))))
     t = dig(m, "tests") or {}
     py, jv = t.get("python_collected"), t.get("java_junit")

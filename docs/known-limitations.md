@@ -116,3 +116,39 @@
 - **ZAP's active scan (`zap-full-scan.py`) independently rediscovered real SQLi and XSS** using its own
   payloads (not reused from our test suite), and that traffic correctly tripped SEN-002, SEN-003, SEN-007 and
   SEN-009 live through the real pipeline — useful independent corroboration for the OWASP findings in T10.
+
+## Windows endpoint source (T11)
+- **Real exporter verified on this actual dev machine**, not only against synthetic data:
+  `windows/winpulse_exporter.py` is read-only (it enables no audit policy itself) and was run for real
+  against three native Windows Event Log channels:
+  - **Service installs (Event ID 7045, System log)** are audited by Windows by default on every machine;
+    the exporter found 7 genuine real events (covering real services such as the Intel wireless driver and
+    the Windows Subsystem for Linux install made earlier in this project).
+  - **PowerShell script blocks (Event ID 4104)** were also real and present (156 events) even with no
+    explicit Script Block Logging policy configured, since PowerShell 5.1+ logs its own built-in modules'
+    internals unconditionally; all sampled content was benign Microsoft module-loading code.
+  - **Process creation (Event ID 4688, Security log)** returned "Access is denied" when read without
+    elevation — the Security log is the most access-restricted Windows log by design, separately from
+    whether "Audit Process Creation" is even enabled. The exporter honestly reports 0 events and the access
+    error rather than silently hiding the gap or fabricating data; it was deliberately not run elevated
+    (enabling audit policy or granting log-read rights is a persistent, system-wide change on someone's own
+    machine that was not asked for).
+- **SEN-011's encoded-PowerShell detection is a precise pattern match only, not an entropy threshold.**
+  An entropy-based branch (`cmdline_entropy|gt: 4.5`) was tried and then deliberately dropped after testing
+  showed only a 0.33-bit margin between a real encoded payload (4.64) and ordinary admin PowerShell one-liners
+  (4.32-4.41) — full-command-line entropy is diluted by the surrounding low-entropy English flags/prose, so
+  it does not reliably separate the two. `cmdline_entropy` is still computed and exposed as a fact any rule
+  can use (and is unit-tested), but no shipped rule currently keys off it alone for this reason.
+- **SEN-011 does not catch a plain-text (unencoded) download-cradle script block**, e.g. a literal
+  `IEX (New-Object Net.WebClient).DownloadString(...)` with no `-EncodedCommand`/`-enc` present. This matches
+  the PRD's specific ask ("encoded PowerShell"), not broader PowerShell threat coverage; a plain-text
+  suspicious-content rule would be a reasonable future addition, not claimed here.
+- **F-09's class of gap, generalised:** endpoint detections (SEN-010/011/012) do not use `block_ip` directly
+  in their own response lists, since blocking a compromised endpoint's own IP is not obviously the right
+  first action (unlike blocking an external network attacker). The existing cross-rule escalation mechanism
+  (3+ distinct detectors from one source in a window) can still add a block on top, which is realistic
+  (network-isolating a confirmed-compromised workstation is a legitimate SOC action) but is a different,
+  coarser decision than any single endpoint rule makes alone.
+- **No real-world Sysmon integration.** WinPulse's three event types were chosen specifically because they
+  need no Sysmon or other kernel driver, only native Windows Event Log channels; a Sysmon-based exporter
+  (more event types, richer fields) is future scope, not attempted here.
