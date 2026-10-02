@@ -1,0 +1,16 @@
+id: SEN-010
+title: Suspicious process spawned by an office application
+description: An Office app (Word/Excel/Outlook) spawned a shell or script interpreter, a classic
+  macro/attachment execution pattern (a LOLBin spawned by a document reader).
+attack_id: T1059
+severity: high
+condition:
+  selection:
+    - source: endpoint
+      event_type: process_create
+      parent_process|re: 'WINWORD\.EXE|EXCEL\.EXE|OUTLOOK\.EXE|POWERPNT\.EXE'
+      process_name|re: 'cmd\.exe|powershell\.exe|wscript\.exe|cscript\.exe|mshta\.exe'
+response:
+  - action: lock_account
+  - action: create_incident
+  - action: notify

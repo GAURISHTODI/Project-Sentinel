@@ -12,6 +12,7 @@ from sentinel.common.schema import NormalizedEvent, Severity
 EVENT_FIELDS = (set(NormalizedEvent.model_fields) - {"label", "campaign", "flow_features"}) | {
     "path_decoded",
     "user_decoded",
+    "cmdline_entropy",
 }
 MODIFIERS = {"contains", "startswith", "endswith", "re", "gt", "gte", "lt", "lte", "exists"}
 

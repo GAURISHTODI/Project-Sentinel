@@ -1,0 +1,18 @@
+id: SEN-011
+title: Encoded or obfuscated PowerShell execution
+description: PowerShell invoked with -EncodedCommand (or an unambiguous abbreviation such as -enc),
+  on the process command line or inside a logged script block.
+attack_id: T1059.001
+severity: high
+condition:
+  selection:
+    - source: endpoint
+      process_name|contains: powershell
+      command_line|re: '-en(c(odedcommand)?)?\s'
+    - source: endpoint
+      event_type: powershell_script_block
+      command_line|re: '-en(c(odedcommand)?)?\s'
+response:
+  - action: lock_account
+  - action: create_incident
+  - action: notify

@@ -20,6 +20,7 @@ from pydantic import ValidationError
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import Detection, NormalizedEvent
 from sentinel.common.security import clean_text, url_decode
+from sentinel.detect.endpoint_features import command_line_entropy
 from sentinel.detect.rules.model import Rule
 from sentinel.detect.rules.state import Store
 
@@ -40,6 +41,8 @@ def build_facts(ev: NormalizedEvent) -> dict[str, Any]:
         facts["path_decoded"] = url_decode(facts["path"])
     if facts.get("user"):
         facts["user_decoded"] = url_decode(facts["user"])
+    if facts.get("command_line"):
+        facts["cmdline_entropy"] = command_line_entropy(facts["command_line"])
     return facts
 
 

@@ -1,0 +1,16 @@
+id: SEN-012
+title: Service installed from a user-writable location
+description: A new Windows service's image path points into a user-writable directory
+  (Users\Public, a user profile's Temp/AppData, or ProgramData), a common persistence
+  technique since legitimate services almost always install under Program Files or
+  System32.
+attack_id: T1543
+severity: high
+condition:
+  selection:
+    - source: endpoint
+      event_type: service_install
+      command_line|re: '\\users\\public\\|\\appdata\\local\\temp\\|\\temp\\|\\programdata\\'
+response:
+  - action: create_incident
+  - action: notify

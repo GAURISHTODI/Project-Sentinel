@@ -383,13 +383,24 @@ def test_end_to_end_attackers_blocked_and_no_benign_ip_is_ever_blocked() -> None
     pipe = Pipeline(DetectionEngine(rules), e.responder)
     gen = Generator(eps=500, duration=30, attack_ratio=0.2, seed=3)
     attackers: set[str] = set()
+    ip_labels: dict[str, set[str | None]] = {}
     for ev in gen.stream():
-        if ev.label != "benign" and ev.src_ip:
-            attackers.add(ev.src_ip)
+        if ev.src_ip:
+            ip_labels.setdefault(ev.src_ip, set()).add(ev.label)
+            if ev.label != "benign":
+                attackers.add(ev.src_ip)
         pipe.handle_message(ev.model_dump_json())
     blocked = {k.removeprefix("sen:blocklist:") for k in e.r.scan_iter("sen:blocklist:*")}
     assert blocked and blocked <= attackers, f"non-attacker blocked: {blocked - attackers}"
-    assert not any(ip.startswith("10.") for ip in blocked)
+    # Endpoint campaigns (unlike network/app attacks) run on a real user's own home IP, since the
+    # "attack" is a compromised workstation, not a separate attacker box. Escalation can therefore
+    # legitimately quarantine a 10.x address when it is the genuinely compromised host (it still
+    # must appear in `attackers`, i.e. have real attack-labeled traffic, checked above) -- but a
+    # 10.x block must never happen from benign traffic alone.
+    endpoint_labels = {"endpoint_powershell", "endpoint_spawn", "endpoint_service"}
+    for ip in blocked:
+        if ip.startswith("10."):
+            assert ip_labels[ip] & endpoint_labels, f"{ip} blocked with no endpoint attack traffic"
     assert e.repo.verify_chain()[0] and e.repo.incidents
     assert pipe.counts["detections"] > len(e.repo.incidents)  # grouping collapsed repeats
 
