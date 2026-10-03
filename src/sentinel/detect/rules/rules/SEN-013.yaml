@@ -1,0 +1,21 @@
+id: SEN-013
+title: Network-layer connection flood
+description: One source opening an abnormal number of connections to the same destination within
+  a short window, regardless of protocol or port (distinct from SEN-004's many-distinct-ports
+  scan, and from SEN-007's application-layer HTTP flood, which only sees requests that reach the
+  app's own HTTP log).
+attack_id: T1499
+severity: high
+condition:
+  selection:
+    source: network
+    event_type: flow
+  window:
+    group_by: [src_ip, dst_ip]
+    seconds: 10
+    threshold: 150
+response:
+  - action: block_ip
+    ttl_seconds: 900
+  - action: create_incident
+  - action: notify

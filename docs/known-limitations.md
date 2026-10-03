@@ -152,3 +152,43 @@
 - **No real-world Sysmon integration.** WinPulse's three event types were chosen specifically because they
   need no Sysmon or other kernel driver, only native Windows Event Log channels; a Sysmon-based exporter
   (more event types, richer fields) is future scope, not attempted here.
+
+## Network capture (T12)
+- **Docker Desktop's WSL2-virtualised networking required two real workarounds**, found by actually
+  capturing traffic rather than assuming a standard Linux Docker bridge would behave identically:
+  1. `tshark`'s own live-capture wrapper fails to enumerate any interface inside a minimal container even
+     though its underlying engine, `dumpcap`, works correctly when invoked directly. `dumpcap` is used for
+     the capture step; `tshark` is still used unmodified to read and analyse the resulting pcap.
+  2. A third-party container attached only to the `lab` network does not get true promiscuous visibility of
+     *other* containers' traffic under Docker Desktop's WSL2 backend -- only its own traffic and broadcast
+     noise (ARP, IPv6 neighbor discovery). The capture container instead shares the target's own network
+     namespace (`--network container:sentinel-target-shop-1`), the standard "sidecar capture" pattern, which
+     sees that container's real traffic directly with no change to the target image.
+  3. A BPF capture filter (`-f "ip host ..."`) combined with the `any` pseudo-interface silently captured
+     zero packets in this libpcap build (the filter does not match the SLL/cooked-mode framing `any`
+     produces); the capture is therefore unfiltered and the documented filters are applied as tshark
+     **display** filters when reading the pcap back instead -- the standard Wireshark workflow of capturing
+     broadly then narrowing for analysis, not a step back from filtering.
+- **A real, extreme-volume nmap scan (`-p-`, all 65,535 ports) exposed a genuine O(n^2) characteristic in
+  `MemoryStore`'s sliding window** (`detect/rules/state.py`): `record()` scans its whole bucket on every
+  call to evict expired entries, which is fine for realistic traffic (the synthetic generator's own port-scan
+  scenario never exceeds 250 ports per campaign) but degrades badly when ~65,000 connection attempts for one
+  key land inside the same sub-second window, since eviction never triggers until entries age past the
+  window and the bucket just keeps growing. The real-world consequence is bounded: `CachedStore`, used by
+  the live production pipeline (`sentinel.detect.run`), uses a `MemoryStore` internally for its hot path and
+  would inherit this same characteristic for this one pathological case. `RedisStore` is algorithmically
+  O(log n) per call (sorted-set operations), but at this same extreme volume the per-event, per-rule network
+  round trip dominates instead: a direct `RedisStore` run over all 65,578 real events did not finish within
+  60 seconds against either fakeredis or a real local Redis, confirming round-trip count, not Redis's own
+  complexity, is the limiting factor there. None of this affects normal operation -- it was only reachable by
+  deliberately running an attack tool with no realistic constraint on its own traffic volume, and detection
+  was proven correct on a real, much smaller (but equally real, equally pcap-derived) slice of the same
+  capture: see `network/samples/real_nmap_scan.conn.log`. Fixing the extreme-volume case (e.g. a
+  time-ordered deque instead of a scanned dict in `MemoryStore`) is noted as future work, not attempted here.
+- **SEN-013 (network-layer connection flood) needed a real-data bug fix.** The first version of the
+  Suricata-side normalizer treated any flow state other than `"established"` as scan-like, which is wrong:
+  a normal, fully-completed HTTP request legitimately ends in Suricata's `"closed"` state (after
+  `"established"`), not stuck in `"established"` forever. This was caught by running Suricata for real over
+  a captured DoS-flood pcap, not by a unit test fixture (the fixtures only ever exercised `"new"` vs
+  `"established"`); fixed to check specifically for `state == "new"` (a flow that never got a reply),
+  matching the equivalent, already-correct logic on the Zeek side (`ZEEK_INCOMPLETE_STATES`).

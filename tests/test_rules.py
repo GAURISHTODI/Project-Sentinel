@@ -47,9 +47,9 @@ def ids(dets: list[Detection]) -> set[str | None]:
 # ------------------------------------------------------------------ the rule set itself
 
 
-def test_twelve_rules_load_and_follow_conventions() -> None:
+def test_all_rules_load_and_follow_conventions() -> None:
     rules = load_rules(DEFAULT_RULES_DIR)
-    expected = [f"SEN-00{i}" for i in range(1, 10)] + [f"SEN-0{i}" for i in (10, 11, 12)]
+    expected = [f"SEN-00{i}" for i in range(1, 10)] + [f"SEN-0{i}" for i in (10, 11, 12, 13)]
     assert [r.id for r in rules] == expected
     for r in rules:
         assert r.attack_id.startswith("T") and r.response and r.severity
@@ -345,7 +345,7 @@ def _copy_rules(tmp: Path) -> Path:
 def test_hot_reload_adds_rule_and_survives_bad_edit(tmp_path: Path) -> None:
     d = _copy_rules(tmp_path)
     e = RuleEngine(MemoryStore(), rules_dir=d, check_interval=0)
-    assert len(e.rules) == 12 and e.evaluate(ev(path="/admin-secret")) == []
+    assert len(e.rules) == 13 and e.evaluate(ev(path="/admin-secret")) == []
 
     new = d / "SEN-020.yaml"
     new.write_text(
@@ -363,7 +363,7 @@ def test_hot_reload_adds_rule_and_survives_bad_edit(tmp_path: Path) -> None:
 
     new.unlink()
     e.reload_if_changed(force=True)
-    assert len(e.rules) == 12 and e.last_error is None
+    assert len(e.rules) == 13 and e.last_error is None
 
 
 def test_duplicate_rule_ids_rejected(tmp_path: Path) -> None:

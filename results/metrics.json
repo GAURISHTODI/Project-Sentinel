@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-02T12:19:29+00:00",
-  "git_commit": "9bd561a",
+  "generated_at": "2026-10-03T04:48:50+00:00",
+  "git_commit": "180faf1+dirty",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -12,7 +12,7 @@
     "events": 60000,
     "attack_events": 6000,
     "campaigns": 448,
-    "detections": 2617,
+    "detections": 2619,
     "scenarios": {
       "endpoint_service": {
         "campaigns": 210,
@@ -242,6 +242,15 @@
         "campaigns": 210,
         "campaigns_detected": 210,
         "campaign_recall": 1.0
+      },
+      "SEN-013": {
+        "detections": 2,
+        "true_positive_detections": 0,
+        "false_positive_detections": 2,
+        "precision": 0.0,
+        "campaigns": 0,
+        "campaigns_detected": 0,
+        "campaign_recall": null
       }
     },
     "false_positives": {
@@ -267,6 +276,7 @@
         "SEN-010",
         "SEN-011",
         "SEN-012",
+        "SEN-013",
         "none"
       ],
       "rows": {
@@ -283,6 +293,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 210,
+          "SEN-013": 0,
           "none": 0
         },
         "endpoint_powershell": {
@@ -298,6 +309,7 @@
           "SEN-010": 0,
           "SEN-011": 56,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "sqli": {
@@ -313,6 +325,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "path_traversal": {
@@ -328,6 +341,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "endpoint_spawn": {
@@ -343,6 +357,7 @@
           "SEN-010": 64,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "valid_account_abuse": {
@@ -358,6 +373,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 11
         },
         "scanner": {
@@ -373,6 +389,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "xss": {
@@ -388,6 +405,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "brute_force": {
@@ -403,6 +421,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "credential_stuffing": {
@@ -418,6 +437,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "port_scan": {
@@ -433,6 +453,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "dos": {
@@ -448,6 +469,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 0
         },
         "benign (events)": {
@@ -463,6 +485,7 @@
           "SEN-010": 0,
           "SEN-011": 0,
           "SEN-012": 0,
+          "SEN-013": 0,
           "none": 53993
         }
       }
@@ -470,37 +493,37 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 188.2,
-        "p50_ms": 135.0,
-        "p95_ms": 430.6,
-        "max_ms": 9079.1
+        "mean_ms": 357.0,
+        "p50_ms": 281.3,
+        "p95_ms": 835.5,
+        "max_ms": 9202.4
       },
       "pipeline_per_detection": {
-        "n": 2617,
-        "mean_ms": 160.9,
-        "p50_ms": 133.1,
-        "p95_ms": 407.2,
-        "max_ms": 736.2
+        "n": 2619,
+        "mean_ms": 336.9,
+        "p50_ms": 284.1,
+        "p95_ms": 837.0,
+        "max_ms": 1311.9
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 247.1,
-        "p50_ms": 157.1,
-        "p95_ms": 486.6,
-        "max_ms": 9081.7
+        "mean_ms": 438.6,
+        "p50_ms": 329.2,
+        "p95_ms": 920.3,
+        "max_ms": 9208.9
       },
       "note": null
     },
     "throughput": {
       "events": 60000,
-      "seconds": 59.01,
-      "events_per_second": 1016.8,
+      "seconds": 59.04,
+      "events_per_second": 1016.2,
       "service_events_processed": 60000,
       "service_invalid_dropped": 0
     }
   },
   "rules": {
-    "count": 12,
+    "count": 13,
     "attack_techniques": [
       "T1046",
       "T1059",
@@ -516,7 +539,7 @@
     "technique_count": 10
   },
   "tests": {
-    "python_collected": 195,
+    "python_collected": 222,
     "java_junit": null
   },
   "ml": {

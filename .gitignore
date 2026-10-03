@@ -41,3 +41,9 @@ archive/
 .kilo/
 mlflow.db
 mlruns/
+
+# raw packet captures and full Zeek/Suricata output (large, regenerable; only small curated
+# samples under network/samples/ are committed as evidence -- see lab/06_capture_attack.sh)
+results/network/*.pcap
+results/network/zeek_out*/
+results/network/suricata_out*/
