@@ -15,13 +15,16 @@ from sentinel.common.logging import get_logger
 from sentinel.detect.engine import (
     DetectionEngine,
     Detector,
+    FraudDetector,
     NetworkMLDetector,
     PhishingURLDetector,
     Pipeline,
 )
 from sentinel.detect.ml.predictor import (
     DEFAULT_DIR,
+    DEFAULT_FRAUD_DIR,
     DEFAULT_PHISHING_DIR,
+    FraudPredictor,
     NetworkPredictor,
     PhishingPredictor,
 )
@@ -51,6 +54,8 @@ def build_pipeline(
         extra.append(NetworkMLDetector(NetworkPredictor(DEFAULT_DIR, "xgb_binary"), multi))
     if cfg.phishing_detector_enabled and (DEFAULT_PHISHING_DIR / "url_model.joblib").exists():
         extra.append(PhishingURLDetector(PhishingPredictor()))
+    if use_ml and (DEFAULT_FRAUD_DIR / "fraud_model.joblib").exists():
+        extra.append(FraudDetector(FraudPredictor()))
     repo = PgRepo(cfg.database_url.get_secret_value())
     policy = load_policy()
     notifier = Notifier(cfg.webhook_url.get_secret_value() or None, cfg.webhook_flavor)

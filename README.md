@@ -41,7 +41,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T14 Grafana (detect service exports events, detections by ATT&CK technique, actions by outcome and latency histograms on :8001; Prometheus scrapes it live as up; provisioned "Sentinel detection and response" dashboard renders all 8 panel queries with real series)
 - [x] T15 Anomaly models (Isolation Forest and PyTorch autoencoder trained on benign CIC-IDS2017 traffic only; threshold set on held-out benign rows for 1% FPR; on the untouched test split the autoencoder reaches 50% recall and Isolation Forest 15%, reported separately from the supervised models)
 - [x] T16 Phishing URL classifier (PhiUSIIL, 235,795 URLs, lexical features from the URL string only, host-disjoint test split; F1 0.990 on that split, but it flags legitimate URLs with a trailing slash 92% of the time, so the detector is opt-in and not a production control; see docs/known-limitations.md)
-- [ ] T17 Fraud model
+- [x] T17 Fraud model (XGBoost with class weights, no resampling; ULB credit-card data, 284,807 transactions; test PR-AUC 0.872, ROC-AUC 0.973; recall 0.867 at a validation-chosen 0.80 precision target, which gave 0.794 precision on test; detector fires on transaction events, verified live on real held-out rows)
 - [ ] T18 Triage agent
 - [ ] T19 Injection test suite
 - [ ] T20 CI security gates

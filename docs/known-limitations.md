@@ -291,3 +291,25 @@
 - **Only the URL string is used.** The dataset's page-content columns (title, favicon, line count, JS features)
   are excluded because they are unavailable for a URL seen in traffic. A richer model would need page fetching,
   which is out of scope and risky for untrusted links.
+
+## Card-fraud model (T17)
+- **The dataset came from a Hugging Face re-upload, not Kaggle.** Kaggle downloads need an account API key, and the
+  OpenML mirror of the same ULB file kept resetting mid-transfer from this network (curl exit 56, and servers that
+  ignored Range requests). The file used is `David-Egea/Creditcard-fraud-detection`. Its row count (284,807) and
+  fraud count (492) and column layout match the published dataset, but its bytes were not checked against a
+  published checksum, so treat the provenance as "matches the published counts", not "verified identical".
+- **Features are anonymised PCA components.** V1..V28 cannot be explained in business terms, so an analyst sees a
+  score, not a reason. The explanation field reports only the probability and amount.
+- **Precision target missed slightly on test.** The threshold for 0.80 precision was chosen on validation rows and
+  gave 0.794 precision on the untouched test split, with recall 0.867. The gap is expected from a threshold chosen
+  on a smaller set; it is reported, not corrected by moving the threshold.
+- **Imbalance is handled by class weights only.** `imbalanced-learn` is not installed, so SMOTE was not used.
+  Class weights (`scale_pos_weight` from the fit split) avoid putting synthetic transactions into training.
+- **Test set is small for the rarest class.** 98 frauds in the test split, so precision and recall at the high-precision
+  targets rest on a few dozen detections. Per-target confidence intervals were not computed.
+- **Two days, European cardholders, 2013.** Nothing here reflects current card-fraud patterns or other regions.
+- **Time is relative, not wall-clock.** It is seconds from the first transaction in the dataset. Live transactions
+  would need their own time reference, which the feature does not yet use.
+- **No live source of transactions yet.** The traffic generator produces no `transaction` events, so the detector is
+  exercised only by events published by hand. The live demo used five real rows (three frauds, two legitimate),
+  all three frauds flagged and neither legitimate row flagged. That is a demonstration of the path, not a rate.

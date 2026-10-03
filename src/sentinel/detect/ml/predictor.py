@@ -16,6 +16,7 @@ from sentinel.detect.ml.url_features import url_features
 
 DEFAULT_DIR = Path("models/network")
 DEFAULT_PHISHING_DIR = Path("models/phishing")
+DEFAULT_FRAUD_DIR = Path("models/fraud")
 MIN_FEATURE_COVERAGE = 0.8  # refuse to score a flow that is mostly missing features
 
 
@@ -75,4 +76,25 @@ class PhishingPredictor:
 
     def phishing_probability(self, url: str) -> float:
         vec = pd.DataFrame([url_features(url)], columns=self.features)
+        return float(self._model.predict_proba(vec)[0, 1])
+
+
+class FraudPredictor:
+    """Scores one transaction's feature map with the card-fraud model. Inputs are untrusted."""
+
+    def __init__(self, model_dir: Path = DEFAULT_FRAUD_DIR) -> None:
+        bundle = joblib.load(model_dir / "fraud_model.joblib")
+        self._model = bundle["model"]
+        self.features: list[str] = bundle["features"]
+        self.threshold: float = float(bundle["threshold"])
+        self.model_name = "fraud-xgb"
+
+    def fraud_probability(self, features: Mapping[str, float]) -> float:
+        missing = [f for f in self.features if f not in features]
+        if missing:
+            raise ValueError(f"transaction is missing features: {missing[:3]}")
+        values = [float(features[f]) for f in self.features]
+        if not all(math.isfinite(v) for v in values):
+            raise ValueError("transaction has non-finite feature values")
+        vec = pd.DataFrame([values], columns=self.features)
         return float(self._model.predict_proba(vec)[0, 1])

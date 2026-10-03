@@ -18,7 +18,7 @@ from sentinel.common import metrics
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import Detection, NormalizedEvent
 from sentinel.common.security import clean_text
-from sentinel.detect.ml.predictor import NetworkPredictor, PhishingPredictor
+from sentinel.detect.ml.predictor import FraudPredictor, NetworkPredictor, PhishingPredictor
 from sentinel.detect.ml.url_features import host_of
 from sentinel.detect.rules.engine import RuleEngine
 from sentinel.respond.responder import Responder
@@ -112,6 +112,38 @@ class PhishingURLDetector:
                 explanation=(
                     f"Phishing URL model flagged a link to {clean_text(host_of(ev.url), 120)}: "
                     f"probability {p:.3f}."
+                ),
+            )
+        ]
+
+
+class FraudDetector:
+    """Scores transaction events from their feature map; skips everything else."""
+
+    def __init__(self, predictor: FraudPredictor) -> None:
+        self.predictor = predictor
+
+    def evaluate(self, ev: NormalizedEvent) -> list[Detection]:
+        if ev.event_type != "transaction" or not ev.flow_features:
+            return []
+        try:
+            p = self.predictor.fraud_probability(ev.flow_features)
+        except ValueError:
+            return []
+        if p < self.predictor.threshold:
+            return []
+        return [
+            Detection(
+                event_id=ev.event_id,
+                model_name=self.predictor.model_name,
+                attack_id="T1657",
+                severity="high" if p >= 0.9 else "medium",
+                score=min(p, 0.99),
+                timestamp_event=ev.timestamp_generated,
+                src_ip=ev.src_ip,
+                user=ev.user,
+                explanation=(
+                    f"Card-fraud model scored this transaction {p:.3f} (amount {ev.amount})."
                 ),
             )
         ]
