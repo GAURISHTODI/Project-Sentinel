@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T04:48:50+00:00",
-  "git_commit": "180faf1+dirty",
+  "generated_at": "2026-10-03T04:52:05+00:00",
+  "git_commit": "77d82bb",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -493,31 +493,31 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 357.0,
-        "p50_ms": 281.3,
-        "p95_ms": 835.5,
-        "max_ms": 9202.4
+        "mean_ms": 345.3,
+        "p50_ms": 287.3,
+        "p95_ms": 726.7,
+        "max_ms": 9182.6
       },
       "pipeline_per_detection": {
         "n": 2619,
-        "mean_ms": 336.9,
-        "p50_ms": 284.1,
-        "p95_ms": 837.0,
-        "max_ms": 1311.9
+        "mean_ms": 328.5,
+        "p50_ms": 286.1,
+        "p95_ms": 754.7,
+        "max_ms": 1111.8
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 438.6,
-        "p50_ms": 329.2,
-        "p95_ms": 920.3,
-        "max_ms": 9208.9
+        "mean_ms": 426.4,
+        "p50_ms": 339.3,
+        "p95_ms": 819.1,
+        "max_ms": 9187.9
       },
       "note": null
     },
     "throughput": {
       "events": 60000,
       "seconds": 59.04,
-      "events_per_second": 1016.2,
+      "events_per_second": 1016.3,
       "service_events_processed": 60000,
       "service_invalid_dropped": 0
     }
