@@ -234,6 +234,7 @@ def collect_sections() -> dict[str, Any]:
                                                           read by name, e.g. dig(m, "ml", "network")
     results/owasp/summary.json -> metrics['owasp']        one file, the whole section (T10)
     results/ci/summary.json   -> metrics['ci']           one file, the whole section (T20)
+    results/triage/summary.json -> metrics['triage']     injection pass rate (T19)
 
     Anything hand-added directly to metrics.json instead of one of these files is silently
     discarded the next time this runs -- write the results/<section>/ file instead.
@@ -244,7 +245,7 @@ def collect_sections() -> dict[str, Any]:
         out["ml"] = {
             p.stem: json.loads(p.read_text(encoding="utf-8")) for p in sorted(ml_dir.glob("*.json"))
         }
-    for section in ("owasp", "ci"):
+    for section in ("owasp", "ci", "triage"):
         summary = RESULTS / section / "summary.json"
         if summary.exists():
             out[section] = json.loads(summary.read_text(encoding="utf-8"))

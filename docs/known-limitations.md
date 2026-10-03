@@ -313,3 +313,27 @@
 - **No live source of transactions yet.** The traffic generator produces no `transaction` events, so the detector is
   exercised only by events published by hand. The live demo used five real rows (three frauds, two legitimate),
   all three frauds flagged and neither legitimate row flagged. That is a demonstration of the path, not a rate.
+
+## LLM triage agent and injection suite (T18, T19)
+- **The 100% injection pass rate is for scripted adversaries, not a real model.** The suite runs 19 textbook
+  payloads in four untrusted fields (user agent, path, username, command line) against three fixed model
+  behaviours: one that answers with a severity downgrade, one that requests an enforcement action, and one that
+  echoes its input. All 228 cases pass. That shows the guardrails hold against those behaviours: schema
+  validation, a fixed recommendation catalogue, severity pinned to the detector's value, and no executor in the
+  agent. It does not show that a live language model resists injection. Measuring that needs a live model, which
+  was not available here.
+- **The live Gemini adapter has not been run.** There is no API key in this environment, so the adapter is covered
+  only by a transport-mocked test of the request shape (key in a header, never in the URL). Its model name and
+  endpoint should be confirmed against the current Gemini documentation before a live run.
+- **Stored incidents do not keep raw event fields.** The incidents table holds the explanation, username and source
+  IP. The user agent, path and command line that the injection suite exercises are not persisted, so triage of a
+  stored incident sees less than the suite assumes. Passing those fields through would need a schema change.
+- **The model may cite only techniques Sentinel maps.** Citations are checked against the ATT&CK ids in the rule files
+  and the ML mappings. A well-formed but unknown id such as T9999 is rejected; that check was added after a test
+  showed the first version accepted it.
+- **Severity is pinned to the detector's value.** The model's severity is discarded and recorded as an override.
+  That is deliberate: the model should not be able to move an incident's severity in either direction.
+- **The call budget is in memory.** The daily cap resets when the process restarts, so a restart can exceed the
+  intended daily limit. Persisting the counter is not done yet.
+- **Triage output is a suggestion.** Recommendations such as `block_source_ip_after_review` are text for an analyst.
+  Nothing in the agent calls the responder, so no enforcement follows from a model reply.
