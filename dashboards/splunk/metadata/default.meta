@@ -1,0 +1,13 @@
+; Makes the Sentinel app's saved searches and dashboard visible app-wide (not just to the user
+; that created them), so they appear for anyone browsing this Splunk instance.
+[]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+[views]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+[savedsearches]
+access = read : [ * ], write : [ admin, power ]
+export = system

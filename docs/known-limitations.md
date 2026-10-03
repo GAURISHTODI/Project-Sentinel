@@ -192,3 +192,34 @@
   a captured DoS-flood pcap, not by a unit test fixture (the fixtures only ever exercised `"new"` vs
   `"established"`); fixed to check specifically for `state == "new"` (a flow that never got a reply),
   matching the equivalent, already-correct logic on the Zeek side (`ZEEK_INCOMPLETE_STATES`).
+
+## Splunk visibility (T13)
+- **A read-only bind mount broke Splunk's first-boot provisioning.** The app bundle was first mounted
+  `:ro`. Splunk's ansible-based entrypoint recursively `chown`s all of `/opt/splunk` to the `splunk` user on
+  every boot; it cannot change ownership inside a read-only mount, so provisioning hung at the
+  `change_splunk_directory_owner` task and the container stayed `unhealthy` with permission errors. The
+  mount is now writable. Found by reading the container log, not by assumption.
+- **The health check had a false positive in my own watcher.** A `grep healthy` loop matched `unhealthy`
+  and reported success. Waits now match the exact `(healthy)` status.
+- **`docker exec` runs as uid 999 `ansible`, not `splunk`.** Splunk CLI and `btool` calls need
+  `docker exec -u splunk` or they fail with `Permission denied` on files that are actually correct.
+- **Splunk's REST API is on 8089, which is not published by compose.** Verification runs inside the container
+  via `docker exec -u splunk ... curl https://localhost:8089`. Port 8000 (splunkweb) also fails from the Windows
+  host's curl with a schannel TLS error (`SEC_E_INVALID_TOKEN`) even though HEC on 8088 works; the forwarder
+  itself uses httpx and is unaffected.
+- **The "Blocked IPs" saved search returned 0 rows on the first run while Postgres had 476 applied blocks.**
+  Splunk auto-extracts the JSON `detail` object as dotted fields (`detail.outcome`, `detail.detector`), so the
+  original `spath input=detail | search outcome="applied"` matched nothing. Fixed to filter on
+  `detail.outcome`. Verified afterward: 475 applied block events across 81 IPs, matching Postgres exactly.
+- **Saved searches use a 24-hour window, and the generator's timestamps span more than that.** Over all time
+  the index holds the complete data (4,437 detections, 754 incidents, 8,176 audit rows, all matching Postgres
+  or the sent count), but the dashboard only shows the last 24 hours of event time. This is correct behaviour,
+  not data loss, but a reviewer looking at the dashboard will see fewer rows than exist.
+- **Failed HEC sends for incidents and audit rows were silently skipped.** The forwarder advanced its
+  row cursor even when HEC rejected the event, so those rows never reached Splunk and nothing counted the
+  loss. Fixed: the cursor now stops at the first failure and the row is retried on the next poll, covered by
+  an integration test with a forced 503. Detections still have no retry: a failed detection send is counted
+  as `hec_failed` and dropped, because Splunk is visibility only and never drives a decision.
+- **The pipeline run during verification was memory-constrained.** On this 16 GB machine a `MemoryError` hit
+  the generator while 6 orphaned Sentinel consumers from earlier background launches were still running. Those
+  were stopped and each stage was rerun in the foreground.

@@ -1,0 +1,77 @@
+<form version="1.1" theme="dark">
+  <label>Sentinel Overview</label>
+  <description>Detections, incidents and enforcement actions forwarded by Sentinel over HEC.</description>
+  <fieldset submitButtonLabel="Apply" autoRun="true">
+    <input type="time" token="tr">
+      <label>Time range</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Detections by severity</title>
+      <chart>
+        <search>
+          <query>index=sentinel sourcetype=sentinel:detection | stats count by severity</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Techniques over time</title>
+      <chart>
+        <search ref="Sentinel - Techniques over time">
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top attackers</title>
+      <table>
+        <search ref="Sentinel - Top attackers">
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Blocked IPs</title>
+      <table>
+        <search ref="Sentinel - Blocked IPs">
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Failed logins (brute force / credential stuffing)</title>
+      <table>
+        <search ref="Sentinel - Failed logins">
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Open incidents</title>
+      <table>
+        <search>
+          <query>index=sentinel sourcetype=sentinel:incident status!="closed" | stats latest(severity) AS severity, latest(status) AS status, latest(event_count) AS event_count, latest(explanation) AS explanation BY id</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

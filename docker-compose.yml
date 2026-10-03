@@ -206,4 +206,8 @@ services:
       SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN:?set SPLUNK_HEC_TOKEN in .env}
     volumes:
       - splunk-data:/opt/splunk/var
+      # NOT :ro -- Splunk's ansible-based entrypoint recursively chowns all of /opt/splunk (including
+      # this app dir) to the splunk user on every boot; a read-only bind mount can't be chowned, which
+      # hangs that step forever and cascades into "permission denied" writing Splunk's own logs.
+      - ./dashboards/splunk:/opt/splunk/etc/apps/sentinel
     mem_limit: 3g
