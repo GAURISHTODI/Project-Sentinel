@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T09:36:03+00:00",
-  "git_commit": "754dd09",
+  "generated_at": "2026-10-03T17:31:40+00:00",
+  "git_commit": "2c62bef",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -493,31 +493,31 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 299.8,
-        "p50_ms": 235.6,
-        "p95_ms": 653.4,
-        "max_ms": 9193.3
+        "mean_ms": 310.3,
+        "p50_ms": 246.6,
+        "p95_ms": 640.8,
+        "max_ms": 9209.4
       },
       "pipeline_per_detection": {
         "n": 2619,
-        "mean_ms": 283.5,
-        "p50_ms": 254.7,
-        "p95_ms": 638.9,
-        "max_ms": 1018.4
+        "mean_ms": 294.1,
+        "p50_ms": 266.3,
+        "p95_ms": 648.5,
+        "max_ms": 970.5
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 373.4,
-        "p50_ms": 268.5,
-        "p95_ms": 755.7,
-        "max_ms": 9201.5
+        "mean_ms": 391.1,
+        "p50_ms": 300.4,
+        "p95_ms": 760.4,
+        "max_ms": 9220.1
       },
       "note": null
     },
     "throughput": {
       "events": 60000,
-      "seconds": 59.04,
-      "events_per_second": 1016.3,
+      "seconds": 59.05,
+      "events_per_second": 1016.2,
       "service_events_processed": 60000,
       "service_invalid_dropped": 0
     }
@@ -539,7 +539,7 @@
     "technique_count": 10
   },
   "tests": {
-    "python_collected": 252,
+    "python_collected": 259,
     "java_junit": null
   },
   "ml": {
@@ -661,6 +661,179 @@
         "Scores are not calibrated probabilities; the threshold targets an FPR, not precision.",
         "Attacks that look statistically normal are expected to be missed.",
         "Reported separately from the supervised models; not directly comparable."
+      ]
+    },
+    "fraud": {
+      "dataset": "ULB credit-card fraud (Dal Pozzolo et al. 2015), Hugging Face re-upload David-Egea/Creditcard-fraud-detection",
+      "test_pr_auc": 0.8721747500399517,
+      "test_roc_auc": 0.9731652966476405,
+      "test_prevalence": 0.0017204452090867595,
+      "test_n": 56962,
+      "test_fraud": 98,
+      "precision_targets": {
+        "precision_0.50": {
+          "chosen_on": "validation split",
+          "validation": {
+            "threshold": 0.008534346707165241,
+            "reachable": true,
+            "precision": 0.5,
+            "recall": 0.8481012658227848,
+            "false_positive_rate": 0.0014728511760826555,
+            "confusion_matrix": {
+              "labels": [
+                "legitimate",
+                "fraud"
+              ],
+              "matrix": [
+                [
+                  45423,
+                  67
+                ],
+                [
+                  12,
+                  67
+                ]
+              ]
+            }
+          },
+          "test": {
+            "threshold": 0.008534346707165241,
+            "reachable": true,
+            "precision": 0.455026455026455,
+            "recall": 0.8775510204081632,
+            "false_positive_rate": 0.0018113393359594824,
+            "confusion_matrix": {
+              "labels": [
+                "legitimate",
+                "fraud"
+              ],
+              "matrix": [
+                [
+                  56761,
+                  103
+                ],
+                [
+                  12,
+                  86
+                ]
+              ]
+            }
+          }
+        },
+        "precision_0.80": {
+          "chosen_on": "validation split",
+          "validation": {
+            "threshold": 0.11339762061834335,
+            "reachable": true,
+            "precision": 0.8076923076923077,
+            "recall": 0.7974683544303798,
+            "false_positive_rate": 0.0003297428006155199,
+            "confusion_matrix": {
+              "labels": [
+                "legitimate",
+                "fraud"
+              ],
+              "matrix": [
+                [
+                  45475,
+                  15
+                ],
+                [
+                  16,
+                  63
+                ]
+              ]
+            }
+          },
+          "test": {
+            "threshold": 0.11339762061834335,
+            "reachable": true,
+            "precision": 0.794392523364486,
+            "recall": 0.8673469387755102,
+            "false_positive_rate": 0.00038688801350590885,
+            "confusion_matrix": {
+              "labels": [
+                "legitimate",
+                "fraud"
+              ],
+              "matrix": [
+                [
+                  56842,
+                  22
+                ],
+                [
+                  13,
+                  85
+                ]
+              ]
+            }
+          }
+        },
+        "precision_0.90": {
+          "chosen_on": "validation split",
+          "validation": {
+            "threshold": 0.8038719296455383,
+            "reachable": true,
+            "precision": 0.9117647058823529,
+            "recall": 0.7848101265822784,
+            "false_positive_rate": 0.00013189712024620797,
+            "confusion_matrix": {
+              "labels": [
+                "legitimate",
+                "fraud"
+              ],
+              "matrix": [
+                [
+                  45484,
+                  6
+                ],
+                [
+                  17,
+                  62
+                ]
+              ]
+            }
+          },
+          "test": {
+            "threshold": 0.8038719296455383,
+            "reachable": true,
+            "precision": 0.9090909090909091,
+            "recall": 0.8163265306122449,
+            "false_positive_rate": 0.00014068655036578504,
+            "confusion_matrix": {
+              "labels": [
+                "legitimate",
+                "fraud"
+              ],
+              "matrix": [
+                [
+                  56856,
+                  8
+                ],
+                [
+                  18,
+                  80
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "deployed_threshold": 0.11339762061834335,
+      "deployed_threshold_target_precision": 0.8,
+      "split": {
+        "method": "stratified 80/20 train/test, then stratified 80/20 fit/validation of train",
+        "fit_rows": 182276,
+        "validation_rows": 45569,
+        "test_rows": 56962,
+        "seed": 42
+      },
+      "imbalance": "scale_pos_weight = 181961/315 from fit split; no resampling",
+      "limitations": [
+        "V1..V28 are anonymised PCA components; decisions cannot be explained in business",
+        "The dataset is from two days in September 2013 with European cardholders only.",
+        "Time is seconds from the first dataset transaction, not wall-clock time",
+        "Thresholds were chosen on validation rows for a precision target; live rates differ"
       ]
     },
     "network": {
