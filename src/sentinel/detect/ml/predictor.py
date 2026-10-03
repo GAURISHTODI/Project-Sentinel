@@ -12,7 +12,10 @@ import joblib
 import numpy as np
 import pandas as pd
 
+from sentinel.detect.ml.url_features import url_features
+
 DEFAULT_DIR = Path("models/network")
+DEFAULT_PHISHING_DIR = Path("models/phishing")
 MIN_FEATURE_COVERAGE = 0.8  # refuse to score a flow that is mostly missing features
 
 
@@ -56,3 +59,20 @@ class NetworkPredictor:
         probs = self._pipe.predict_proba(self._vector(flow))[0]
         i = int(np.argmax(probs))
         return self.classes[i], float(probs[i])
+
+
+class PhishingPredictor:
+    """Scores one URL string with the trained lexical phishing model. Input is untrusted."""
+
+    def __init__(self, model_dir: Path = DEFAULT_PHISHING_DIR, threshold: float = 0.5) -> None:
+        if not 0.0 < threshold < 1.0:
+            raise ValueError("threshold must be in (0, 1)")
+        self.threshold = threshold
+        bundle = joblib.load(model_dir / "url_model.joblib")
+        self._model = bundle["model"]
+        self.features: list[str] = bundle["features"]
+        self.model_name = "phishing-url"
+
+    def phishing_probability(self, url: str) -> float:
+        vec = pd.DataFrame([url_features(url)], columns=self.features)
+        return float(self._model.predict_proba(vec)[0, 1])

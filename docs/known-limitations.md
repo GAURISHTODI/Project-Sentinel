@@ -267,3 +267,27 @@
   defined yet.
 - **A first training run failed with `MemoryError` while a full pytest run was executing in parallel.** The
   retry, run alone, completed with the same sample and seed. Heavy jobs were not run concurrently after that.
+
+## Phishing URL classifier (T16)
+- **The headline score does not hold up on a trivial change.** On the host-disjoint test split the deployed
+  model reaches F1 0.990, ROC-AUC 0.997 and 0.4% FPR. But appending a single `/` to legitimate test URLs
+  flags 91.8% of them as phishing (the full-feature model: 100%). The dataset has no legitimate URL that ends
+  in `/` and no legitimate URL with a path, so the model learned "bare domain means legitimate" through several
+  features, not one. The test-split numbers are real but describe this dataset's construction, not live traffic.
+- **Found on live URLs, not on the test set.** The first live run flagged `python.org`, `github.com` and
+  `dkom.hr` as phishing at probability about 1.0. Inspecting the feature importances showed the full model relied
+  on `path_len` (54%) and `has_https` (42%). A model without `path_len`, `has_https` and `has_www` was then
+  deployed. That choice was made after observing the failure, not from test metrics, and it still fails the
+  trailing-slash probe, so it is not a fix.
+- **So the detector is opt-in.** It is registered only when `PHISHING_DETECTOR_ENABLED` is set. Enabling it
+  will raise high-severity incidents on ordinary links, so it should not be enabled on real traffic until a
+  dataset with legitimate URLs that have paths and query strings is available and the trailing-slash
+  false-positive rate is acceptable.
+- **Evaluation split is by host, so no domain appears on both sides.** Random splitting would have let the model
+  memorise domains; that is why the host-disjoint split is used. Duplicate URLs (425) were dropped before
+  splitting.
+- **The dataset is a 2024 snapshot.** Phishing kits, naming habits and TLD use drift; nothing here was tested
+  against recent phishing campaigns.
+- **Only the URL string is used.** The dataset's page-content columns (title, favicon, line count, JS features)
+  are excluded because they are unavailable for a URL seen in traffic. A richer model would need page fetching,
+  which is out of scope and risky for untrusted links.

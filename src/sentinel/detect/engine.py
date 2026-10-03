@@ -17,7 +17,9 @@ from pydantic import ValidationError
 from sentinel.common import metrics
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import Detection, NormalizedEvent
-from sentinel.detect.ml.predictor import NetworkPredictor
+from sentinel.common.security import clean_text
+from sentinel.detect.ml.predictor import NetworkPredictor, PhishingPredictor
+from sentinel.detect.ml.url_features import host_of
 from sentinel.detect.rules.engine import RuleEngine
 from sentinel.respond.responder import Responder
 
@@ -79,6 +81,37 @@ class NetworkMLDetector:
                 explanation=(
                     f"Network IDS model flagged this flow: attack probability {p:.3f}; "
                     f"most likely class {label} (confidence {conf:.2f})."
+                ),
+            )
+        ]
+
+
+class PhishingURLDetector:
+    """Scores any event that carries a URL. The URL is untrusted: it only feeds the model and,
+    cleaned and host-only, the explanation."""
+
+    def __init__(self, predictor: PhishingPredictor) -> None:
+        self.predictor = predictor
+
+    def evaluate(self, ev: NormalizedEvent) -> list[Detection]:
+        if not ev.url:
+            return []
+        p = self.predictor.phishing_probability(ev.url)
+        if p < self.predictor.threshold:
+            return []
+        return [
+            Detection(
+                event_id=ev.event_id,
+                model_name=self.predictor.model_name,
+                attack_id="T1566",
+                severity="high" if p >= 0.9 else "medium",
+                score=min(p, 0.99),
+                timestamp_event=ev.timestamp_generated,
+                src_ip=ev.src_ip,
+                user=ev.user,
+                explanation=(
+                    f"Phishing URL model flagged a link to {clean_text(host_of(ev.url), 120)}: "
+                    f"probability {p:.3f}."
                 ),
             )
         ]

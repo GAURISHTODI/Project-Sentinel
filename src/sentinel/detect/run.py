@@ -12,8 +12,19 @@ from prometheus_client import start_http_server
 
 from sentinel.common.config import get_settings
 from sentinel.common.logging import get_logger
-from sentinel.detect.engine import DetectionEngine, NetworkMLDetector, Pipeline
-from sentinel.detect.ml.predictor import DEFAULT_DIR, NetworkPredictor
+from sentinel.detect.engine import (
+    DetectionEngine,
+    Detector,
+    NetworkMLDetector,
+    PhishingURLDetector,
+    Pipeline,
+)
+from sentinel.detect.ml.predictor import (
+    DEFAULT_DIR,
+    DEFAULT_PHISHING_DIR,
+    NetworkPredictor,
+    PhishingPredictor,
+)
 from sentinel.detect.rules.engine import RuleEngine
 from sentinel.detect.rules.state import CachedStore, RedisStore
 from sentinel.ingest.producer import EventProducer
@@ -33,11 +44,13 @@ def build_pipeline(
     r = redis.Redis.from_url(cfg.redis_url.get_secret_value(), decode_responses=True)
     store = CachedStore(RedisStore(r))  # partition-local windows, batched write-behind to Redis
     rules = RuleEngine(store)
-    extra = []
+    extra: list[Detector] = []
     if use_ml and (DEFAULT_DIR / "xgb_binary.joblib").exists():
         multi_path = DEFAULT_DIR / "xgb_multi.joblib"
         multi = NetworkPredictor(DEFAULT_DIR, "xgb_multi") if multi_path.exists() else None
         extra.append(NetworkMLDetector(NetworkPredictor(DEFAULT_DIR, "xgb_binary"), multi))
+    if cfg.phishing_detector_enabled and (DEFAULT_PHISHING_DIR / "url_model.joblib").exists():
+        extra.append(PhishingURLDetector(PhishingPredictor()))
     repo = PgRepo(cfg.database_url.get_secret_value())
     policy = load_policy()
     notifier = Notifier(cfg.webhook_url.get_secret_value() or None, cfg.webhook_flavor)

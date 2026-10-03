@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     splunk_hec_url: str = "https://127.0.0.1:8088/services/collector/event"
     splunk_hec_token: SecretStr = Field(default=SecretStr(""))
     splunk_verify_tls: bool = False  # Splunk's dev container uses a self-signed certificate
+    phishing_detector_enabled: bool = (
+        False  # opt-in: the URL model fails on bare-domain-only training data
+    )
     jwt_secret: SecretStr = Field(default=SecretStr(""))  # required to start the API (>= 32 chars)
     jwt_ttl_minutes: int = 30
     api_docs: bool = False  # expose /docs only in development

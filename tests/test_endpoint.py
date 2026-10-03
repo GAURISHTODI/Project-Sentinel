@@ -205,7 +205,6 @@ def test_label_cannot_be_smuggled_in_from_a_raw_log() -> None:
 # ------------------------------------------------------------------ sample logs -> rules
 
 
-
 def _load_sample(name: str) -> list[dict[str, object]]:
     path = SAMPLES / f"{name}.jsonl"
     with path.open(encoding="utf-8") as f:
