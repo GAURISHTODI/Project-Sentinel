@@ -1,0 +1,144 @@
+name: security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks (full history)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  semgrep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: semgrep/semgrep:1.90.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep (python, java, docker, owasp rules)
+        run: semgrep scan --config p/python --config p/java --config p/dockerfile --config p/owasp-top-ten --error --metrics=off
+
+  codeql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      matrix:
+        language: [python, java-kotlin]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: actions/setup-java@v4
+        if: matrix.language == 'java-kotlin'
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Build Java for CodeQL
+        if: matrix.language == 'java-kotlin'
+        run: mvn -q -B -f target-shop/pom.xml -DskipTests package && mvn -q -B -f responder/pom.xml -DskipTests package
+      - uses: github/codeql-action/analyze@v3
+
+  iac:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Checkov (Dockerfiles, compose, Terraform, Kubernetes)
+        run: |
+          pip install -q checkov==3.2.*
+          checkov -d . --framework dockerfile,docker_compose,terraform,kubernetes --quiet --compact --soft-fail-on CKV_DOCKER_2,CKV_DOCKER_3
+
+  dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: OWASP Dependency-Check (Maven and pip manifests)
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: sentinel
+          path: .
+          format: SARIF
+          args: --failOnCVSS 9 --enableRetired
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check
+          path: reports/
+
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: docker compose --profile core build target-shop responder
+      - name: Trivy (HIGH and CRITICAL, fixed only)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: sentinel/target-shop:1.0.0
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Trivy (responder)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: sentinel/responder:1.0.0
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  dast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start core stack
+        run: |
+          cp .env.example .env
+          sed -i "s/^JWT_SECRET=.*/JWT_SECRET=$(openssl rand -hex 32)/" .env
+          sed -i "s/^REDIS_PASSWORD=.*/REDIS_PASSWORD=$(openssl rand -hex 16)/" .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" .env
+          docker compose --profile core up -d --build
+      - name: Wait for target-shop v2 health
+        run: |
+          for i in $(seq 1 30); do
+            docker compose ps target-shop | grep -q healthy && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: ZAP baseline on target-shop (lab network)
+        run: |
+          docker run --rm --network lab -v "$PWD:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://172.30.0.11:8080 -r zap-baseline.html -I
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline
+          path: zap-baseline.html
+      - name: Tear down
+        if: always()
+        run: docker compose --profile core down -v
