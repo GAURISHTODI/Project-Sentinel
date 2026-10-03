@@ -223,3 +223,26 @@
 - **The pipeline run during verification was memory-constrained.** On this 16 GB machine a `MemoryError` hit
   the generator while 6 orphaned Sentinel consumers from earlier background launches were still running. Those
   were stopped and each stage was rerun in the foreground.
+
+## Metrics and Grafana (T14)
+- **The `notify` action was reported as `failed` when no webhook was configured.** `Notifier` returns False
+  when there is no URL, and the action mapped that to `Outcome.FAILED`, so an unconfigured deployment
+  reported every notification as a delivery failure. This showed up as 191 `notify=failed` series in the
+  first live metrics scrape. Fixed with a distinct `not_configured` outcome, covered by a test. Existing audit
+  rows from before the fix (`notify|failed`, 2,907 of them) were written for the same unconfigured state and
+  are not real delivery failures.
+- **The metrics endpoint listens on all interfaces (`0.0.0.0:8001`).** Prometheus runs in a container and
+  reaches the host through `host.docker.internal`, which a loopback bind cannot serve. The endpoint is
+  unauthenticated, so anyone who can reach that port on this machine's network can read the counters.
+  Acceptable for a laptop lab; it should be bound to a private interface or put behind the gateway before any
+  shared deployment.
+- **Only the detection service is scraped.** The responder gateway, target-shop and the ingest normalizer
+  export nothing. Gateway-level latency and rate-limit counts therefore do not appear in Grafana yet.
+- **Latency histograms measure in-process work only.** `sentinel_event_processing_seconds` times rule and ML
+  evaluation for one event. It does not include Kafka queueing time, so it understates end-to-end latency
+  under load. `sentinel_response_seconds` times the action plan for one detection.
+- **Counters reset when the process restarts.** Prometheus `rate()` handles resets, but `increase()` over a
+  window that spans a restart undercounts by the pre-restart total.
+- **The dashboard was checked through the APIs, not in a browser.** Every panel query returns real series from
+  Prometheus and Grafana loads the provisioned dashboard and datasource (health OK). Visual layout was not
+  inspected in a browser in this run.

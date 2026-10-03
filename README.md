@@ -38,7 +38,7 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T11 Endpoint source (WinPulse format, real exporter verified against this machine's own Event Log, SEN-010..012, endpoint anomaly features, 29 tests on sample logs)
 - [x] T12 Network source (real tshark/Zeek/Suricata capture against live lab attacks via lab/06_capture_attack.sh; SEN-004 and SEN-013 verified firing on genuinely pcap-derived data, not synthetic)
 - [x] T13 Splunk (HEC forwarder sent 4,437/4,437 real detections; incident and audit counts match Postgres exactly; sentinel index, 4 saved searches and dashboard provisioned from the mounted app bundle and verified via Splunk's REST API)
-- [ ] T14 Grafana
+- [x] T14 Grafana (detect service exports events, detections by ATT&CK technique, actions by outcome and latency histograms on :8001; Prometheus scrapes it live as up; provisioned "Sentinel detection and response" dashboard renders all 8 panel queries with real series)
 - [ ] T15 Anomaly models
 - [ ] T16 Phishing URL classifier
 - [ ] T17 Fraud model

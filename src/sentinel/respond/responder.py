@@ -12,6 +12,7 @@ import httpx
 import psycopg
 import redis
 
+from sentinel.common import metrics
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import Detection
 from sentinel.common.security import clean_text
@@ -102,15 +103,18 @@ class Responder:
             self._flush_one(memo, now)
         results: list[ActionResult] = []
         incident_id: int | None = None
+        started = time.perf_counter()
         for spec in self._plan(det):
             res = self._run(spec, det)
             res.ts = self.clock()
             results.append(res)
             self.stats[(res.action, res.outcome.value)] += 1
+            metrics.ACTIONS.labels(action=res.action, outcome=res.outcome.value).inc()
             if res.action == "create_incident" and "id" in res.detail:
                 incident_id = int(res.detail["id"])
             if res.outcome in (Outcome.APPLIED, Outcome.FAILED):
                 self._audit(det, res)
+        metrics.RESPONSE_SECONDS.observe(time.perf_counter() - started)
         if incident_id is not None and self.suppress_seconds > 0:
             self._memo[key] = _Memo(incident_id, now + self.suppress_seconds)
         if incident_id is not None and any(

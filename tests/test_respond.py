@@ -202,6 +202,12 @@ def test_notification_is_sanitised_and_bounded() -> None:
     assert "\x00" not in text and "\x1b" not in text and "\n" not in text and len(text) < 600
 
 
+def test_notify_without_webhook_is_not_configured_not_failed() -> None:
+    e = Env()
+    e.actions.notifier.url = None
+    assert e.actions.notify(det(), {}).outcome == Outcome.NOT_CONFIGURED
+
+
 def test_notification_cooldown_and_failure_handling() -> None:
     e = Env()
     assert e.actions.notify(det(), {}).outcome == Outcome.APPLIED

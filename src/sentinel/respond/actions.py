@@ -37,6 +37,7 @@ class Outcome(StrEnum):
     BELOW_SEVERITY = "below_severity"
     NO_TARGET = "no_target"
     DRY_RUN = "dry_run"
+    NOT_CONFIGURED = "not_configured"
     FAILED = "failed"
 
 
@@ -135,6 +136,8 @@ class Actions:
     def notify(self, det: Detection, params: dict[str, Any]) -> ActionResult:
         if self.policy.dry_run:  # checked first: a dry run must not consume the cooldown
             return ActionResult("notify", Outcome.DRY_RUN)
+        if not self.notifier.url:
+            return ActionResult("notify", Outcome.NOT_CONFIGURED)
         cooldown = self.policy.notify_cooldown_seconds
         key = f"sen:notified:{det.rule_id or det.model_name}:{det.src_ip or det.user}"
         if cooldown and not self.r.set(key, 1, nx=True, ex=cooldown):

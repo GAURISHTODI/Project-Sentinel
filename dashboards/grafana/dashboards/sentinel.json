@@ -1,0 +1,61 @@
+{
+  "uid": "sentinel-detect",
+  "title": "Sentinel detection and response",
+  "tags": ["sentinel"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {"from": "now-30m", "to": "now"},
+  "panels": [
+    {
+      "id": 1, "type": "timeseries", "title": "Events per second by source",
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []},
+      "targets": [{"refId": "A", "expr": "sum by (source) (rate(sentinel_events_total[1m]))", "legendFormat": "{{source}}"}]
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "Detections per minute by ATT&CK technique",
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "targets": [{"refId": "A", "expr": "sum by (attack_id) (rate(sentinel_detections_total[1m]) * 60)", "legendFormat": "{{attack_id}}"}]
+    },
+    {
+      "id": 3, "type": "bargauge", "title": "Detections by severity (last 1h)",
+      "gridPos": {"x": 0, "y": 8, "w": 8, "h": 7},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "options": {"orientation": "horizontal", "displayMode": "gradient"},
+      "targets": [{"refId": "A", "expr": "sum by (severity) (increase(sentinel_detections_total[1h]))", "legendFormat": "{{severity}}", "instant": true}]
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "Response actions per second by outcome",
+      "gridPos": {"x": 8, "y": 8, "w": 16, "h": 7},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "targets": [{"refId": "A", "expr": "sum by (action, outcome) (rate(sentinel_actions_total[1m]))", "legendFormat": "{{action}} / {{outcome}}"}]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Event evaluation latency (p50 / p95)",
+      "gridPos": {"x": 0, "y": 15, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "targets": [
+        {"refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(sentinel_event_processing_seconds_bucket[5m])))", "legendFormat": "p50"},
+        {"refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(sentinel_event_processing_seconds_bucket[5m])))", "legendFormat": "p95"}
+      ]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Response latency per detection (p50 / p95)",
+      "gridPos": {"x": 12, "y": 15, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "targets": [
+        {"refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(sentinel_response_seconds_bucket[5m])))", "legendFormat": "p50"},
+        {"refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(sentinel_response_seconds_bucket[5m])))", "legendFormat": "p95"}
+      ]
+    }
+  ]
+}

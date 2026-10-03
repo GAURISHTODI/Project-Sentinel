@@ -8,6 +8,7 @@ import time
 from collections.abc import Callable
 
 import redis
+from prometheus_client import start_http_server
 
 from sentinel.common.config import get_settings
 from sentinel.common.logging import get_logger
@@ -81,9 +82,14 @@ def main(argv: list[str] | None = None) -> int:
         help="with --idle-exit: give up if no message arrives within N seconds",
     )
     ap.add_argument("--no-ml", action="store_true")
+    ap.add_argument(
+        "--metrics-port", type=int, default=8001, help="Prometheus /metrics port (0 disables)"
+    )
     a = ap.parse_args(argv)
 
     cfg = get_settings()
+    if a.metrics_port:
+        start_http_server(a.metrics_port)
     pipe, det_out, repo, flush_all = build_pipeline(use_ml=not a.no_ml)
     consumer = Consumer(
         {

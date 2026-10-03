@@ -7,12 +7,14 @@ before any detector sees the event.
 
 from __future__ import annotations
 
+import time
 from collections import Counter
 from collections.abc import Callable, Sequence
 from typing import Protocol
 
 from pydantic import ValidationError
 
+from sentinel.common import metrics
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import Detection, NormalizedEvent
 from sentinel.detect.ml.predictor import NetworkPredictor
@@ -122,9 +124,17 @@ class Pipeline:
             self.counts["invalid"] += 1  # poison message: drop it, keep the loop alive
             return []
         self.counts["events"] += 1
+        metrics.EVENTS.labels(source=ev.source).inc()
+        started = time.perf_counter()
         dets = self.engine.process(ev)
+        metrics.EVENT_SECONDS.observe(time.perf_counter() - started)
         for d in dets:
             self.counts["detections"] += 1
+            metrics.DETECTIONS.labels(
+                detector=d.rule_id or d.model_name or "unknown",
+                attack_id=d.attack_id or "none",
+                severity=d.severity,
+            ).inc()
             if self.publish is not None:
                 self.publish(d)
             if self.responder is not None:
