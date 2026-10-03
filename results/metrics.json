@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T05:56:26+00:00",
-  "git_commit": "470647d",
+  "generated_at": "2026-10-03T07:42:44+00:00",
+  "git_commit": "35fd0da",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -493,24 +493,24 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 343.3,
-        "p50_ms": 268.8,
-        "p95_ms": 821.3,
-        "max_ms": 9206.2
+        "mean_ms": 273.7,
+        "p50_ms": 215.6,
+        "p95_ms": 571.3,
+        "max_ms": 9203.8
       },
       "pipeline_per_detection": {
         "n": 2619,
-        "mean_ms": 322.1,
-        "p50_ms": 278.1,
-        "p95_ms": 781.3,
-        "max_ms": 1238.7
+        "mean_ms": 254.8,
+        "p50_ms": 228.4,
+        "p95_ms": 568.0,
+        "max_ms": 942.5
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 420.7,
-        "p50_ms": 329.3,
-        "p95_ms": 901.5,
-        "max_ms": 9212.7
+        "mean_ms": 341.7,
+        "p50_ms": 242.2,
+        "p95_ms": 614.3,
+        "max_ms": 9207.8
       },
       "note": null
     },
@@ -539,7 +539,7 @@
     "technique_count": 10
   },
   "tests": {
-    "python_collected": 232,
+    "python_collected": 235,
     "java_junit": null
   },
   "ml": {
