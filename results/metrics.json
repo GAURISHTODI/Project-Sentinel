@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T09:22:59+00:00",
-  "git_commit": "6e4792d",
+  "generated_at": "2026-10-03T09:36:03+00:00",
+  "git_commit": "754dd09",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -493,24 +493,24 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 296.7,
-        "p50_ms": 237.7,
-        "p95_ms": 642.4,
-        "max_ms": 9226.2
+        "mean_ms": 299.8,
+        "p50_ms": 235.6,
+        "p95_ms": 653.4,
+        "max_ms": 9193.3
       },
       "pipeline_per_detection": {
         "n": 2619,
-        "mean_ms": 283.9,
-        "p50_ms": 256.0,
-        "p95_ms": 658.0,
-        "max_ms": 953.4
+        "mean_ms": 283.5,
+        "p50_ms": 254.7,
+        "p95_ms": 638.9,
+        "max_ms": 1018.4
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 369.3,
-        "p50_ms": 276.8,
-        "p95_ms": 764.3,
-        "max_ms": 9234.9
+        "mean_ms": 373.4,
+        "p50_ms": 268.5,
+        "p95_ms": 755.7,
+        "max_ms": 9201.5
       },
       "note": null
     },
@@ -539,7 +539,7 @@
     "technique_count": 10
   },
   "tests": {
-    "python_collected": 239,
+    "python_collected": 252,
     "java_junit": null
   },
   "ml": {
@@ -1022,6 +1022,82 @@
           "Heartbleed": 9
         }
       }
+    },
+    "phishing": {
+      "deployed_model_without_structure_shortcuts": {
+        "precision": 0.9947228250147958,
+        "recall": 0.9842377513175874,
+        "f1": 0.9894525117739403,
+        "false_positive_rate": 0.003959736510991044,
+        "roc_auc": 0.9974402837990916,
+        "pr_auc": 0.9978244609747077,
+        "threshold": 0.5,
+        "confusion_matrix": {
+          "labels": [
+            "legitimate",
+            "phishing"
+          ],
+          "matrix": [
+            [
+              26915,
+              107
+            ],
+            [
+              323,
+              20169
+            ]
+          ]
+        },
+        "n_test": 47514,
+        "n_test_phishing": 20492,
+        "trailing_slash_false_positive_rate": 0.9176
+      },
+      "full_feature_model": {
+        "precision": 0.9997061416397296,
+        "recall": 0.9960960374780402,
+        "f1": 0.9978978244927891,
+        "false_positive_rate": 0.0002220412996817408,
+        "roc_auc": 0.9984960879036209,
+        "pr_auc": 0.9988934707670082,
+        "threshold": 0.5,
+        "confusion_matrix": {
+          "labels": [
+            "legitimate",
+            "phishing"
+          ],
+          "matrix": [
+            [
+              27016,
+              6
+            ],
+            [
+              80,
+              20412
+            ]
+          ]
+        },
+        "n_test": 47514,
+        "n_test_phishing": 20492,
+        "trailing_slash_false_positive_rate": 1.0
+      },
+      "dataset": "PhiUSIIL Phishing URL Dataset (UCI id 967, 2024)",
+      "split": {
+        "method": "group split by hostname (no host in both train and test)",
+        "train_rows": 187856,
+        "test_rows": 47514,
+        "seed": 42
+      },
+      "dedupe": {
+        "rows": 235795,
+        "duplicate_urls_dropped": 425
+      },
+      "features": "URL string only (lexical); page-content columns excluded",
+      "limitations": [
+        "Lexical features only: a well-made phishing URL on a clean-looking domain can pass.",
+        "Dataset is a 2024 snapshot; phishing kits and naming habits drift over time.",
+        "Threshold fixed at 0.5 and not calibrated for live traffic base rates.",
+        "The URL string is untrusted; features are length-capped before parsing."
+      ]
     }
   },
   "owasp": {
