@@ -1,0 +1,120 @@
+{
+  "training_data": "benign rows only; attack labels never fit or pick a threshold",
+  "split": {
+    "test_size": 0.2,
+    "train_rows": 157211,
+    "benign_fit_rows": 96289,
+    "benign_validation_rows": 32097,
+    "test_rows": 39303,
+    "test_attack_rows": 7206,
+    "scaler_fit_on": "benign fit rows only"
+  },
+  "models": {
+    "isolation_forest": {
+      "type": "IsolationForest",
+      "trees": 200
+    },
+    "autoencoder": {
+      "type": "PyTorch MLP autoencoder",
+      "architecture": "62-32-8-32-62",
+      "epochs": 15,
+      "loss": "mean squared reconstruction error"
+    }
+  },
+  "metrics": {
+    "isolation_forest": {
+      "precision": 0.7478753541076487,
+      "recall": 0.14654454621149043,
+      "f1": 0.24506846135994434,
+      "false_positive_rate": 0.011091379256628345,
+      "roc_auc": 0.8011476275369872,
+      "pr_auc": 0.5334887509812656,
+      "threshold": 0.6378413198989054,
+      "threshold_policy": "1% FPR on held-out benign validation rows",
+      "detection_rate_by_class": {
+        "Bot": 0.0,
+        "DDoS": 0.06799336650082918,
+        "DoS GoldenEye": 0.0,
+        "DoS Hulk": 0.28755905511811025,
+        "DoS Slowhttptest": 0.0,
+        "DoS slowloris": 0.2073170731707317,
+        "FTP-Patator": 0.0,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.14285714285714285,
+        "PortScan": 0.0,
+        "SSH-Patator": 0.0,
+        "Web Attack Brute Force": 0.0,
+        "Web Attack SQL Injection": 0.0,
+        "Web Attack XSS": 0.0
+      },
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "attack"
+        ],
+        "matrix": [
+          [
+            31741,
+            356
+          ],
+          [
+            6150,
+            1056
+          ]
+        ]
+      },
+      "n_test": 39303,
+      "n_test_attack": 7206
+    },
+    "autoencoder": {
+      "precision": 0.9160481187611978,
+      "recall": 0.49666944213155706,
+      "f1": 0.6441105012147935,
+      "false_positive_rate": 0.0102190235847587,
+      "roc_auc": 0.8850075140413387,
+      "pr_auc": 0.7208407687356658,
+      "threshold": 1.2022109031677246,
+      "threshold_policy": "1% FPR on held-out benign validation rows",
+      "detection_rate_by_class": {
+        "Bot": 0.0,
+        "DDoS": 0.439469320066335,
+        "DoS GoldenEye": 0.363013698630137,
+        "DoS Hulk": 0.8384251968503937,
+        "DoS Slowhttptest": 0.32051282051282054,
+        "DoS slowloris": 0.4268292682926829,
+        "FTP-Patator": 0.0,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.2857142857142857,
+        "PortScan": 0.003001200480192077,
+        "SSH-Patator": 0.0,
+        "Web Attack Brute Force": 0.0,
+        "Web Attack SQL Injection": 0.0,
+        "Web Attack XSS": 0.0
+      },
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "attack"
+        ],
+        "matrix": [
+          [
+            31769,
+            328
+          ],
+          [
+            3627,
+            3579
+          ]
+        ]
+      },
+      "n_test": 39303,
+      "n_test_attack": 7206
+    }
+  },
+  "limitations": [
+    "Benign traffic from one simulated CIC-IDS2017 network; real benign traffic differs.",
+    "Scores are not calibrated probabilities; the threshold targets an FPR, not precision.",
+    "Attacks that look statistically normal are expected to be missed.",
+    "Reported separately from the supervised models; not directly comparable."
+  ]
+}

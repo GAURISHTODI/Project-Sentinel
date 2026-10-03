@@ -1,0 +1,267 @@
+{
+  "model": "network-anomaly",
+  "trained_at": "2026-10-03 14:49:16",
+  "training_data": "benign rows only; attack labels never fit or pick a threshold",
+  "dataset": {
+    "name": "CIC-IDS2017 MachineLearningCVE",
+    "source": "CICIDS-2017 (MachineLearningCVE CSVs), user-supplied copy in the project folder archive/ (Kaggle re-upload; exact Kaggle URL not provided)",
+    "load_report": {
+      "files": [
+        "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+        "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+        "Friday-WorkingHours-Morning.pcap_ISCX.csv",
+        "Monday-WorkingHours.pcap_ISCX.csv",
+        "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+        "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
+        "Tuesday-WorkingHours.pcap_ISCX.csv",
+        "Wednesday-workingHours.pcap_ISCX.csv"
+      ],
+      "raw_rows": 2830743,
+      "raw_label_counts": {
+        "DDoS": 128027,
+        "BENIGN": 2273097,
+        "PortScan": 158930,
+        "Bot": 1966,
+        "Infiltration": 36,
+        "Web Attack Brute Force": 1507,
+        "Web Attack XSS": 652,
+        "Web Attack SQL Injection": 21,
+        "FTP-Patator": 7938,
+        "SSH-Patator": 5897,
+        "DoS Hulk": 231073,
+        "DoS GoldenEye": 10293,
+        "DoS slowloris": 5796,
+        "DoS Slowhttptest": 5499,
+        "Heartbleed": 11
+      },
+      "dropped_non_finite": 2867,
+      "dropped_duplicates": 256429,
+      "dropped_columns": [
+        "Bwd PSH Flags",
+        "Bwd URG Flags",
+        "Fwd Avg Bytes/Bulk",
+        "Fwd Avg Packets/Bulk",
+        "Fwd Avg Bulk Rate",
+        "Bwd Avg Bytes/Bulk",
+        "Bwd Avg Packets/Bulk",
+        "Bwd Avg Bulk Rate",
+        "SYN Flag Count",
+        "CWE Flag Count",
+        "Avg Fwd Segment Size",
+        "Avg Bwd Segment Size",
+        "Fwd Header Length.1",
+        "Subflow Fwd Packets",
+        "Subflow Fwd Bytes",
+        "Subflow Bwd Packets"
+      ],
+      "sample_label_counts": {
+        "BENIGN": 160483,
+        "DoS Hulk": 15876,
+        "DDoS": 9045,
+        "PortScan": 8330,
+        "DoS GoldenEye": 727,
+        "FTP-Patator": 545,
+        "DoS slowloris": 410,
+        "DoS Slowhttptest": 389,
+        "SSH-Patator": 296,
+        "Bot": 139,
+        "Web Attack Brute Force": 106,
+        "Web Attack XSS": 100,
+        "Infiltration": 36,
+        "Web Attack SQL Injection": 21,
+        "Heartbleed": 11
+      },
+      "sample_rows": 196514,
+      "min_per_class": 100,
+      "seed": 42
+    }
+  },
+  "seed": 42,
+  "split": {
+    "test_size": 0.2,
+    "train_rows": 157211,
+    "benign_fit_rows": 96289,
+    "benign_validation_rows": 32097,
+    "test_rows": 39303,
+    "test_attack_rows": 7206,
+    "scaler_fit_on": "benign fit rows only"
+  },
+  "models": {
+    "isolation_forest": {
+      "type": "IsolationForest",
+      "trees": 200
+    },
+    "autoencoder": {
+      "type": "PyTorch MLP autoencoder",
+      "architecture": "62-32-8-32-62",
+      "epochs": 15,
+      "loss": "mean squared reconstruction error"
+    }
+  },
+  "features": [
+    "Destination Port",
+    "Flow Duration",
+    "Total Fwd Packets",
+    "Total Backward Packets",
+    "Total Length of Fwd Packets",
+    "Total Length of Bwd Packets",
+    "Fwd Packet Length Max",
+    "Fwd Packet Length Min",
+    "Fwd Packet Length Mean",
+    "Fwd Packet Length Std",
+    "Bwd Packet Length Max",
+    "Bwd Packet Length Min",
+    "Bwd Packet Length Mean",
+    "Bwd Packet Length Std",
+    "Flow Bytes/s",
+    "Flow Packets/s",
+    "Flow IAT Mean",
+    "Flow IAT Std",
+    "Flow IAT Max",
+    "Flow IAT Min",
+    "Fwd IAT Total",
+    "Fwd IAT Mean",
+    "Fwd IAT Std",
+    "Fwd IAT Max",
+    "Fwd IAT Min",
+    "Bwd IAT Total",
+    "Bwd IAT Mean",
+    "Bwd IAT Std",
+    "Bwd IAT Max",
+    "Bwd IAT Min",
+    "Fwd PSH Flags",
+    "Fwd URG Flags",
+    "Fwd Header Length",
+    "Bwd Header Length",
+    "Fwd Packets/s",
+    "Bwd Packets/s",
+    "Min Packet Length",
+    "Max Packet Length",
+    "Packet Length Mean",
+    "Packet Length Std",
+    "Packet Length Variance",
+    "FIN Flag Count",
+    "RST Flag Count",
+    "PSH Flag Count",
+    "ACK Flag Count",
+    "URG Flag Count",
+    "ECE Flag Count",
+    "Down/Up Ratio",
+    "Average Packet Size",
+    "Subflow Bwd Bytes",
+    "Init_Win_bytes_forward",
+    "Init_Win_bytes_backward",
+    "act_data_pkt_fwd",
+    "min_seg_size_forward",
+    "Active Mean",
+    "Active Std",
+    "Active Max",
+    "Active Min",
+    "Idle Mean",
+    "Idle Std",
+    "Idle Max",
+    "Idle Min"
+  ],
+  "metrics": {
+    "isolation_forest": {
+      "precision": 0.7478753541076487,
+      "recall": 0.14654454621149043,
+      "f1": 0.24506846135994434,
+      "false_positive_rate": 0.011091379256628345,
+      "roc_auc": 0.8011476275369872,
+      "pr_auc": 0.5334887509812656,
+      "threshold": 0.6378413198989054,
+      "threshold_policy": "1% FPR on held-out benign validation rows",
+      "detection_rate_by_class": {
+        "Bot": 0.0,
+        "DDoS": 0.06799336650082918,
+        "DoS GoldenEye": 0.0,
+        "DoS Hulk": 0.28755905511811025,
+        "DoS Slowhttptest": 0.0,
+        "DoS slowloris": 0.2073170731707317,
+        "FTP-Patator": 0.0,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.14285714285714285,
+        "PortScan": 0.0,
+        "SSH-Patator": 0.0,
+        "Web Attack Brute Force": 0.0,
+        "Web Attack SQL Injection": 0.0,
+        "Web Attack XSS": 0.0
+      },
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "attack"
+        ],
+        "matrix": [
+          [
+            31741,
+            356
+          ],
+          [
+            6150,
+            1056
+          ]
+        ]
+      },
+      "n_test": 39303,
+      "n_test_attack": 7206
+    },
+    "autoencoder": {
+      "precision": 0.9160481187611978,
+      "recall": 0.49666944213155706,
+      "f1": 0.6441105012147935,
+      "false_positive_rate": 0.0102190235847587,
+      "roc_auc": 0.8850075140413387,
+      "pr_auc": 0.7208407687356658,
+      "threshold": 1.2022109031677246,
+      "threshold_policy": "1% FPR on held-out benign validation rows",
+      "detection_rate_by_class": {
+        "Bot": 0.0,
+        "DDoS": 0.439469320066335,
+        "DoS GoldenEye": 0.363013698630137,
+        "DoS Hulk": 0.8384251968503937,
+        "DoS Slowhttptest": 0.32051282051282054,
+        "DoS slowloris": 0.4268292682926829,
+        "FTP-Patator": 0.0,
+        "Heartbleed": 1.0,
+        "Infiltration": 0.2857142857142857,
+        "PortScan": 0.003001200480192077,
+        "SSH-Patator": 0.0,
+        "Web Attack Brute Force": 0.0,
+        "Web Attack SQL Injection": 0.0,
+        "Web Attack XSS": 0.0
+      },
+      "confusion_matrix": {
+        "labels": [
+          "benign",
+          "attack"
+        ],
+        "matrix": [
+          [
+            31769,
+            328
+          ],
+          [
+            3627,
+            3579
+          ]
+        ]
+      },
+      "n_test": 39303,
+      "n_test_attack": 7206
+    }
+  },
+  "train_seconds": 16.2,
+  "environment": {
+    "python": "3.11.9",
+    "torch": "2.14.1+cpu",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "limitations": [
+    "Benign traffic from one simulated CIC-IDS2017 network; real benign traffic differs.",
+    "Scores are not calibrated probabilities; the threshold targets an FPR, not precision.",
+    "Attacks that look statistically normal are expected to be missed.",
+    "Reported separately from the supervised models; not directly comparable."
+  ]
+}

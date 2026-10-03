@@ -246,3 +246,24 @@
 - **The dashboard was checked through the APIs, not in a browser.** Every panel query returns real series from
   Prometheus and Grafana loads the provisioned dashboard and datasource (health OK). Visual layout was not
   inspected in a browser in this run.
+
+## Anomaly models (T15)
+- **Both models are weak on most attack classes.** Isolation Forest reached 14.7% recall and ROC-AUC 0.80; the
+  autoencoder reached 49.7% recall, ROC-AUC 0.89 and PR-AUC 0.72, both at about a 1% false-positive rate on
+  the untouched test split. Per class, the autoencoder catches DoS Hulk (84%), DDoS (44%) and slowloris (43%),
+  but detects PortScan at 0.3%, and misses bot, FTP-Patator, SSH-Patator and all three web-attack classes
+  entirely. Anomaly detection here is a volumetric-traffic detector, not a general intrusion detector.
+- **Statistically normal attacks are invisible to these models.** Brute force and web attacks send well-formed
+  requests with ordinary sizes and rates, so benign-only training gives them no reason to score high. The
+  supervised models (T4) are the right tool for those classes, and the comparison is not like-for-like.
+- **Thresholds were fixed before looking at the test split.** They are the 99th percentile of benign
+  validation scores (1% FPR). Nothing was tuned on test rows; the per-class numbers are reported as measured.
+- **Rare classes have very few test rows.** Heartbleed scored 100% detection on about two test rows, which is
+  not meaningful as a rate. The per-class figures for rows below about 100 test samples are noise.
+- **One sample, one seed.** Results are from seed 42 on the 196,514-row stratified sample. No confidence
+  intervals were computed, and the sample is slightly below the requested 200,000 because of per-class floors.
+- **Not wired into live detection.** The models are trained and evaluated, but `detect.run` does not yet score
+  events with them. Deploying them as a live detector would also need a score-to-severity policy, which is not
+  defined yet.
+- **A first training run failed with `MemoryError` while a full pytest run was executing in parallel.** The
+  retry, run alone, completed with the same sample and seed. Heavy jobs were not run concurrently after that.
