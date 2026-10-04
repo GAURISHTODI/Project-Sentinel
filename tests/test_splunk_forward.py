@@ -7,6 +7,7 @@ import httpx
 import pytest
 
 from sentinel.common.schema import Detection
+from sentinel.respond.repo import PgRepo
 from sentinel.respond.splunk_forward import (
     HecClient,
     detection_event,
@@ -168,41 +169,27 @@ def test_failed_hec_send_keeps_cursor_so_row_is_retried(pg_dsn: str) -> None:
     tag = uuid.uuid4().hex[:8]
     with psycopg.connect(pg_dsn, autocommit=True) as conn:
         row = conn.execute("SELECT coalesce(max(id), 0) FROM audit_log").fetchone()
-        baseline = int(row[0]) if row else 0
-        conn.execute(
-            "INSERT INTO audit_log (actor, action, target, detail) VALUES "
-            "('itest', 'block_ip', %s, '{}'::jsonb)",
-            (f"itest-{tag}",),
-        )
-        try:
-            down = hec(Sink(status=503))
-            cursor = forward_audit(pg_dsn, down, baseline)
-            assert cursor == baseline and down.failed >= 1
+    baseline = int(row[0]) if row else 0
+    # audit_log is append-only, so the test row stays in the table, tagged itest-*
+    PgRepo(pg_dsn).audit("itest", "block_ip", f"itest-{tag}", {})
 
-            up = Sink()
-            forward_audit(pg_dsn, hec(up), cursor)
-            assert [c["event"]["target"] for c in up.calls] == [f"itest-{tag}"]
-        finally:
-            conn.execute("DELETE FROM audit_log WHERE target = %s", (f"itest-{tag}",))
+    down = hec(Sink(status=503))
+    cursor = forward_audit(pg_dsn, down, baseline)
+    assert cursor == baseline and down.failed >= 1
+
+    up = Sink()
+    forward_audit(pg_dsn, hec(up), cursor)
+    assert [c["event"]["target"] for c in up.calls] == [f"itest-{tag}"]
 
 
 @pytest.mark.integration
 def test_forward_audit_sends_new_rows_with_detail_as_dict(pg_dsn: str) -> None:
-    import psycopg
-
     tag = uuid.uuid4().hex[:8]
-    with psycopg.connect(pg_dsn, autocommit=True) as conn:
-        conn.execute(
-            "INSERT INTO audit_log (actor, action, target, detail) VALUES "
-            "('itest', 'block_ip', %s, %s)",
-            (f"itest-{tag}", json.dumps({"outcome": "applied", "detector": "SEN-001"})),
-        )
-        try:
-            sink = Sink()
-            client = hec(sink)
-            since = forward_audit(pg_dsn, client, 0)
-            assert since > 0
-            [event] = [c["event"] for c in sink.calls if c["event"].get("target") == f"itest-{tag}"]
-            assert event["detail"] == {"outcome": "applied", "detector": "SEN-001"}
-        finally:
-            conn.execute("DELETE FROM audit_log WHERE target = %s", (f"itest-{tag}",))
+    PgRepo(pg_dsn).audit(
+        "itest", "block_ip", f"itest-{tag}", {"outcome": "applied", "detector": "SEN-001"}
+    )
+    sink = Sink()
+    since = forward_audit(pg_dsn, hec(sink), 0)
+    assert since > 0
+    [event] = [c["event"] for c in sink.calls if c["event"].get("target") == f"itest-{tag}"]
+    assert event["detail"] == {"outcome": "applied", "detector": "SEN-001"}

@@ -160,6 +160,20 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
       - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./infra/tls:/tls:ro
+      - ./infra/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    # The key is copied into /tmp and re-owned, because bind-mounted files keep the host's owner and
+    # Postgres refuses a key that other users can read.
+    command:
+      - sh
+      - -c
+      - >-
+        cp /tls/server.crt /tls/server.key /tmp/ &&
+        chown postgres:postgres /tmp/server.crt /tmp/server.key &&
+        chmod 600 /tmp/server.key &&
+        exec docker-entrypoint.sh postgres
+        -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key
+        -c hba_file=/etc/postgresql/pg_hba.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s

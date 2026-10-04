@@ -375,7 +375,14 @@
   tamper test disables the trigger explicitly to show the chain still catches an edit.
 - **Passwords for the new roles are in the gitignored .env.** Docker secrets or Vault would be the right home, and
   neither is wired in yet.
-- **No TLS between services yet.** There is no dev CA and no mTLS. Traffic between the API, the database, Kafka and
-  Redis is plaintext on the internal Docker networks.
+- **Postgres uses verified TLS; the other links do not.** A dev CA (`infra/tls/make_dev_ca.sh`) signs the
+  Postgres certificate. `pg_hba` accepts remote connections only over TLS with scram-sha-256, and clients verify the
+  certificate (verify-full). Kafka, Redis and the Spring services still talk in plaintext on the internal networks.
+  The CA keys stay local and are gitignored. The dev CA is not a production PKI.
 - **Security headers are tested on every response.** The API already sets nosniff, DENY framing, no-store caching,
   no referrer and a restrictive CSP. HSTS is not sent because the lab serves plain HTTP.
+- **The audit chain in the lab database was broken and has been reset.** Test fixtures inserted audit rows with raw
+  SQL, which skips the hash chain. Earlier runs deleted those rows during cleanup, which hid the problem. Once the
+  append-only trigger made deletion impossible, the chain broke at row 15519 for good. The lab Postgres volume was
+  removed and re-created with the owner's approval. Lab data (incidents and audit history) regenerates from the
+  generator and attack scripts. Fixtures now write through `PgRepo.audit`, so they hash-chain correctly.

@@ -107,3 +107,19 @@ def test_service_dsn_logs_in_as_its_own_role(service: str) -> None:
     except RuntimeError as exc:
         pytest.skip(str(exc))
     assert user is not None and user[0] == ROLES[service][0]
+
+
+def test_plaintext_connections_to_postgres_are_refused() -> None:
+    import psycopg
+
+    url = get_settings().database_url.get_secret_value().split("?", 1)[0]
+    with pytest.raises(psycopg.OperationalError, match="pg_hba|SSL|ssl"):
+        psycopg.connect(f"{url}?sslmode=disable", connect_timeout=3)
+
+
+def test_verified_tls_session_is_used() -> None:
+    import psycopg
+
+    with psycopg.connect(get_settings().database_url.get_secret_value()) as conn:
+        ssl_on = conn.execute("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()").fetchone()
+    assert ssl_on is not None and ssl_on[0] is True
