@@ -25,6 +25,14 @@ networks:
       config:
         - subnet: 172.30.0.0/24
 
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt
+
 volumes:
   kafka-data:
   redis-data:
@@ -78,11 +86,14 @@ services:
       - "127.0.0.1:8081:8080"
     environment:
       GATEWAY_UPSTREAM: http://172.30.0.11:8080
-      GATEWAY_JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       GATEWAY_REDIS_HOST: redis
-      GATEWAY_REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
       GATEWAY_RATE_LIMIT: ${GATEWAY_RATE_LIMIT:-300}
       JAVA_TOOL_OPTIONS: "-Xms64m -Xmx256m"
+    secrets: [jwt_secret, redis_password]
+    entrypoint:
+      - sh
+      - -c
+      - export GATEWAY_JWT_SECRET="$$(cat /run/secrets/jwt_secret)" GATEWAY_REDIS_PASSWORD="$$(cat /run/secrets/redis_password)"; exec java -jar /app/app.jar
     depends_on:
       redis:
         condition: service_healthy
@@ -133,15 +144,14 @@ services:
     image: redis:7-alpine
     profiles: ["core"]
     networks: [backend, edge]
-    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --maxmemory 256mb --maxmemory-policy volatile-lru --appendonly no"]
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
+    secrets: [redis_password]
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$(cat /run/secrets/redis_password)\" --maxmemory 256mb --maxmemory-policy volatile-lru --appendonly no"]
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      test: ["CMD-SHELL", "redis-cli -a \"$$(cat /run/secrets/redis_password)\" --no-auth-warning ping | grep -q PONG"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -153,8 +163,9 @@ services:
     networks: [backend, edge]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-sentinel}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_DB: ${POSTGRES_DB:-sentinel}
+    secrets: [postgres_password]
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:

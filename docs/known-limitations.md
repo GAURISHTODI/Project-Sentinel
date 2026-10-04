@@ -373,8 +373,11 @@
 - **The audit log is append-only at the database layer.** A trigger rejects UPDATE and DELETE for every role,
   including the owner. A privileged user can disable the trigger, so the hash chain is the real tamper evidence. The
   tamper test disables the trigger explicitly to show the chain still catches an edit.
-- **Passwords for the new roles are in the gitignored .env.** Docker secrets or Vault would be the right home, and
-  neither is wired in yet.
+- **Compose credentials are Docker secrets now, but the host copy is still in .env.** Postgres, Redis and the
+  responder read their secrets from files under `secrets/` (gitignored). The responder's wrapper exports them just
+  before Java starts, so they are not in the container environment or in `docker compose config`. The host-side Python
+  processes still read the same values from the gitignored `.env`, and the database role passwords are only in `.env`.
+  Vault is not used.
 - **Postgres uses verified TLS; the other links do not.** A dev CA (`infra/tls/make_dev_ca.sh`) signs the
   Postgres certificate. `pg_hba` accepts remote connections only over TLS with scram-sha-256, and clients verify the
   certificate (verify-full). Kafka, Redis and the Spring services still talk in plaintext on the internal networks.
