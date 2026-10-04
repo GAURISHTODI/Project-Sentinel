@@ -19,7 +19,7 @@ from typing import Any
 import httpx
 import psycopg
 
-from sentinel.common.config import get_settings
+from sentinel.common.config import dsn_for, get_settings
 from sentinel.common.logging import get_logger
 from sentinel.common.schema import Detection
 
@@ -165,7 +165,7 @@ def main(argv: list[str] | None = None) -> int:
             msg = consumer.poll(0.5)
             now = time.time()
             if now - last_incident_poll > INCIDENT_POLL_SECONDS:
-                dsn = cfg.database_url.get_secret_value()
+                dsn = dsn_for(cfg, "reader")
                 try:
                     since_incident_id = forward_incidents(dsn, hec, since_incident_id)
                     since_audit_id = forward_audit(dsn, hec, since_audit_id)

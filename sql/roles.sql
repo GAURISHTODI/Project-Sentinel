@@ -20,8 +20,11 @@ GRANT USAGE, SELECT ON SEQUENCE incidents_id_seq, audit_log_id_seq TO sentinel_d
 GRANT SELECT ON incidents, audit_log, locked_accounts, roles TO sentinel_api;
 GRANT SELECT, INSERT ON users TO sentinel_api;
 GRANT UPDATE (status) ON incidents TO sentinel_api;
-GRANT USAGE, SELECT ON SEQUENCE users_id_seq TO sentinel_api;
+GRANT INSERT ON audit_log TO sentinel_api;
+GRANT DELETE ON locked_accounts TO sentinel_api;
+GRANT USAGE, SELECT ON SEQUENCE users_id_seq, audit_log_id_seq TO sentinel_api;
 
+-- The API audits its own actions (analyst overrides, user changes) into the same chain.
 -- The audit chain is append-only. The trigger stops casual edits by any role; the hash chain
 -- (verify_chain) is what detects an edit made by someone who can disable the trigger.
 CREATE OR REPLACE FUNCTION audit_log_append_only() RETURNS trigger

@@ -10,7 +10,7 @@ from fastapi import FastAPI
 
 from sentinel.api.app import Deps, create_app
 from sentinel.api.store import PgIncidents, PgUsers
-from sentinel.common.config import get_settings
+from sentinel.common.config import dsn_for, get_settings
 from sentinel.respond.actions import Actions
 from sentinel.respond.notify import Notifier
 from sentinel.respond.policy import load_policy
@@ -19,7 +19,7 @@ from sentinel.respond.repo import PgRepo
 
 def build_app() -> FastAPI:
     cfg = get_settings()
-    dsn = cfg.database_url.get_secret_value()
+    dsn = dsn_for(cfg, "api")
     r = redis.Redis.from_url(cfg.redis_url.get_secret_value(), decode_responses=True)
     repo = PgRepo(dsn)
     policy = load_policy()

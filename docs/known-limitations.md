@@ -366,10 +366,10 @@
   updating when the actions are upgraded.
 
 ## Platform security (T21, partial)
-- **Least-privilege database roles exist, but the services do not use them yet.** `sql/roles.sql` and
-  `scripts/db_roles.sh` create `sentinel_detect`, `sentinel_api` and `sentinel_reader`, and the integration tests
-  confirm what each may and may not do. The running services still connect as the database owner, so the roles
-  protect nothing until each service's DATABASE_URL is switched to its own role.
+- **Services connect as their own database role.** Detection uses `sentinel_detect`, the API and its user CLI use
+  `sentinel_api`, and the Splunk forwarder and triage runner use `sentinel_reader`. The evaluation harness keeps the
+  owner because it deletes rows between runs. Integration tests check what each role may and may not do, and an
+  end-to-end detection run under `sentinel_detect` wrote 198 audit rows with no permission errors.
 - **The audit log is append-only at the database layer.** A trigger rejects UPDATE and DELETE for every role,
   including the owner. A privileged user can disable the trigger, so the hash chain is the real tamper evidence. The
   tamper test disables the trigger explicitly to show the chain still catches an edit.

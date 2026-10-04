@@ -10,7 +10,7 @@ from collections.abc import Callable
 import redis
 from prometheus_client import start_http_server
 
-from sentinel.common.config import get_settings
+from sentinel.common.config import dsn_for, get_settings
 from sentinel.common.logging import get_logger
 from sentinel.detect.engine import (
     DetectionEngine,
@@ -56,7 +56,7 @@ def build_pipeline(
         extra.append(PhishingURLDetector(PhishingPredictor()))
     if use_ml and (DEFAULT_FRAUD_DIR / "fraud_model.joblib").exists():
         extra.append(FraudDetector(FraudPredictor()))
-    repo = PgRepo(cfg.database_url.get_secret_value())
+    repo = PgRepo(dsn_for(cfg, "detect"))
     policy = load_policy()
     notifier = Notifier(cfg.webhook_url.get_secret_value() or None, cfg.webhook_flavor)
     responder = Responder(

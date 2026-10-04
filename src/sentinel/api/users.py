@@ -14,7 +14,7 @@ import sys
 
 from sentinel.api.security import hash_password
 from sentinel.api.store import ROLES, PgUsers
-from sentinel.common.config import get_settings
+from sentinel.common.config import dsn_for, get_settings
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -28,7 +28,7 @@ def main(argv: list[str] | None = None) -> int:
         print("invalid username", file=sys.stderr)
         return 2
     password = os.environ.get("SENTINEL_NEW_PASSWORD") or getpass.getpass("password (12+ chars): ")
-    users = PgUsers(get_settings().database_url.get_secret_value())
+    users = PgUsers(dsn_for(get_settings(), "api"))
     users.create(a.username, hash_password(password), a.role)
     users.close()
     print(f"created {a.role} {a.username}")

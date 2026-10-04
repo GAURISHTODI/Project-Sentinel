@@ -92,3 +92,18 @@ def test_audit_log_trigger_blocks_update_and_delete_for_the_owner() -> None:
             conn.execute("UPDATE audit_log SET actor = actor WHERE id = %s", (row[0],))
         with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
             conn.execute("DELETE FROM audit_log WHERE id = %s", (row[0],))
+
+
+@pytest.mark.parametrize("service", ["detect", "api", "reader"])
+def test_service_dsn_logs_in_as_its_own_role(service: str) -> None:
+    import psycopg
+
+    from sentinel.common.config import dsn_for
+
+    settings = get_settings()
+    try:
+        with psycopg.connect(dsn_for(settings, service), connect_timeout=2) as conn:  # type: ignore[arg-type]
+            user = conn.execute("SELECT current_user").fetchone()
+    except RuntimeError as exc:
+        pytest.skip(str(exc))
+    assert user is not None and user[0] == ROLES[service][0]

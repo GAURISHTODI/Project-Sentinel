@@ -14,7 +14,7 @@ from pathlib import Path
 
 import psycopg
 
-from sentinel.common.config import get_settings
+from sentinel.common.config import dsn_for, get_settings
 from sentinel.triage.agent import IncidentInput, TriageAgent
 from sentinel.triage.llm import GeminiClient, LLMClient, MockLLM
 
@@ -31,7 +31,7 @@ def make_client() -> LLMClient:
 
 
 def load_incident(incident_id: int) -> IncidentInput:
-    dsn = get_settings().database_url.get_secret_value()
+    dsn = dsn_for(get_settings(), "reader")
     with psycopg.connect(dsn) as conn:
         row = conn.execute(
             "SELECT id, rule_id, model_name, attack_id, severity, host(src_ip), username, "
