@@ -364,3 +364,18 @@
   image builds and runs, but the lab attack script was not rerun against it.
 - **Action pins are SHAs.** The tags were resolved through the GitHub API at the time of writing. They will need
   updating when the actions are upgraded.
+
+## Platform security (T21, partial)
+- **Least-privilege database roles exist, but the services do not use them yet.** `sql/roles.sql` and
+  `scripts/db_roles.sh` create `sentinel_detect`, `sentinel_api` and `sentinel_reader`, and the integration tests
+  confirm what each may and may not do. The running services still connect as the database owner, so the roles
+  protect nothing until each service's DATABASE_URL is switched to its own role.
+- **The audit log is append-only at the database layer.** A trigger rejects UPDATE and DELETE for every role,
+  including the owner. A privileged user can disable the trigger, so the hash chain is the real tamper evidence. The
+  tamper test disables the trigger explicitly to show the chain still catches an edit.
+- **Passwords for the new roles are in the gitignored .env.** Docker secrets or Vault would be the right home, and
+  neither is wired in yet.
+- **No TLS between services yet.** There is no dev CA and no mTLS. Traffic between the API, the database, Kafka and
+  Redis is plaintext on the internal Docker networks.
+- **Security headers are tested on every response.** The API already sets nosniff, DENY framing, no-store caching,
+  no referrer and a restrictive CSP. HSTS is not sent because the lab serves plain HTTP.

@@ -333,3 +333,13 @@ def test_internal_errors_do_not_leak_details(env: Env) -> None:
     r = env.client.get("/incidents", headers=h)
     assert r.status_code == 500 and r.json() == {"detail": "internal error"}
     assert "hunter2" not in r.text
+
+
+def test_every_response_carries_security_headers(env: Env) -> None:
+    for path in ("/api/incidents", "/no-such-route"):
+        resp = env.client.get(path)
+        assert resp.headers["X-Content-Type-Options"] == "nosniff"
+        assert resp.headers["X-Frame-Options"] == "DENY"
+        assert resp.headers["Cache-Control"] == "no-store"
+        assert resp.headers["Referrer-Policy"] == "no-referrer"
+        assert "default-src 'none'" in resp.headers["Content-Security-Policy"]

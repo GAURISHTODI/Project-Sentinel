@@ -148,9 +148,13 @@ def test_pg_audit_chain_verifies_and_detects_tampering(pg) -> None:  # type: ign
             "SELECT id, target FROM audit_log WHERE actor = 'itest' AND target = %s", (f"{tag}-1",)
         ).fetchone()
         assert row is not None
+        # The append-only trigger blocks this edit for everyone; the owner disables it only to
+        # simulate a privileged tamperer, who the hash chain must still catch.
+        c.execute("ALTER TABLE audit_log DISABLE TRIGGER audit_log_no_update")
         try:
             c.execute("UPDATE audit_log SET target = 'forged' WHERE id = %s", (row[0],))
             assert repo.verify_chain()[0] is False
         finally:
             c.execute("UPDATE audit_log SET target = %s WHERE id = %s", (row[1], row[0]))
+            c.execute("ALTER TABLE audit_log ENABLE TRIGGER audit_log_no_update")
     assert repo.verify_chain()[0] is True
