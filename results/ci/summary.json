@@ -1,0 +1,64 @@
+{
+  "measured_locally_with": {
+    "gitleaks": "zricethezav/gitleaks:latest (full history, with .gitleaks.toml)",
+    "semgrep": "semgrep/semgrep:1.90.0 with p/python p/java p/dockerfile p/owasp-top-ten",
+    "trivy": "aquasec/trivy:latest on saved images, HIGH and CRITICAL, --ignore-unfixed"
+  },
+  "gitleaks": {
+    "before": 3,
+    "after": 0,
+    "allowlisted_with_reason": 3
+  },
+  "semgrep": {
+    "before": {
+      "findings": 85,
+      "parse_errors": 1
+    },
+    "after": {
+      "findings": 0,
+      "parse_errors": 0
+    },
+    "suppressed": {
+      "nosemgrep_annotations": 5,
+      "ignored_paths": [
+        "results/",
+        "data/",
+        "**/target/",
+        "**/node_modules/",
+        "network/samples/",
+        "tests/test_api.py"
+      ]
+    }
+  },
+  "trivy": {
+    "target-shop": {
+      "before": 38,
+      "after": 0,
+      "severity_before": {
+        "HIGH": 31,
+        "CRITICAL": 7
+      }
+    },
+    "responder": {
+      "before": 35,
+      "after": 0,
+      "severity_before": {
+        "HIGH": 28,
+        "CRITICAL": 7
+      }
+    },
+    "fix": "spring-boot-starter-parent 3.3.5 to 3.5.14; spring-framework 6.2.19, jackson-bom 2.18.11, tomcat 10.1.59 (10.1.58 is not published on Maven Central); kafka 3.9.2 and lz4-java 1.8.1 for target-shop"
+  },
+  "not_yet_run_locally": [
+    "OWASP Dependency-Check",
+    "CodeQL",
+    "ZAP baseline against target-shop v2",
+    "Checkov"
+  ],
+  "ci_workflow_fixes": [
+    "Trivy action reference 0.28.0 corrected to v0.28.0 (tag did not exist)",
+    "images job packages the jars before docker build",
+    "DAST job scans SHOP_VERSION=v2",
+    "all actions pinned to commit SHA"
+  ]
+}

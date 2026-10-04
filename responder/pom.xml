@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.5</version>
+    <version>3.5.14</version>
     <relativePath/>
   </parent>
 
@@ -22,9 +22,9 @@
     <jjwt.version>0.12.6</jjwt.version>
     <jedis.version>5.1.5</jedis.version>
     <!-- Pinned above the parent's managed versions: Trivy reports fixes in these lines (CVE-2026 set). -->
-    <spring-framework.version>6.2.11</spring-framework.version>
+    <spring-framework.version>6.2.19</spring-framework.version>
     <jackson-bom.version>2.18.11</jackson-bom.version>
-    <tomcat.version>10.1.54</tomcat.version>
+    <tomcat.version>10.1.59</tomcat.version>
   </properties>
 
   <dependencies>
