@@ -55,3 +55,4 @@ results/lab/zap_*.html
 results/lab/zap_*.json
 infra/tls/*.key
 infra/tls/*.srl
+infra/tls/*.crt
