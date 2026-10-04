@@ -47,3 +47,5 @@ mlruns/
 results/network/*.pcap
 results/network/zeek_out*/
 results/network/suricata_out*/
+results/ci/gitleaks.json
+results/ci/semgrep.json

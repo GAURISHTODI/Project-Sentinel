@@ -104,6 +104,7 @@ public class ProxyController {
                     values.forEach(v -> res.addHeader(name, v));
                 }
             });
+            // nosemgrep: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer  -- the gateway relays the upstream body verbatim by design; encoding is the target's job
             res.getOutputStream().write(up.body());
             stats.proxied.incrementAndGet();
         } catch (HttpTimeoutException e) {

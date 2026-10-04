@@ -97,6 +97,7 @@ public class OrderAdminController {
     public ResponseEntity<?> file(@RequestParam String name) throws IOException {
         if (!props.secure()) {
             // v1 VULNERABLE (F-12): path traversal. The file name is joined onto the directory unchecked.
+            // nosemgrep: java.spring.security.injection.tainted-file-path.tainted-file-path  -- intentional v1 finding F-12; v2 checks the canonical path
             File f = new File(props.filesDir(), name);
             if (!f.isFile()) {
                 return ResponseEntity.status(404).body(Map.of("error", "file not found: " + f.getPath()));

@@ -1,0 +1,9 @@
+# Generated reports and build output; scanning them only finds URLs and tool noise.
+results/
+data/
+**/target/
+**/node_modules/
+# NDJSON fixtures (one JSON object per line), not single JSON documents; they cannot be parsed as JSON.
+network/samples/
+# Deliberately forged or unsigned tokens that the API must reject; the file exists to test that.
+tests/test_api.py

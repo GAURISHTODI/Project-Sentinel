@@ -1,0 +1,19 @@
+title = "Sentinel gitleaks config (reviewed findings only)"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Documented finding F-02: MD5 of the seeded default admin password, quoted in the OWASP write-up"
+paths = ['''docs/owasp-findings\.md''']
+regexes = ['''21232f297a57a5a743894a0e4a801fc3''']
+
+[[allowlists]]
+description = "Test-only constant in responder test support; never used outside tests"
+paths = ['''responder/src/test/java/com/sentinel/responder/TestSupport\.java''']
+regexes = ['''integration-test-secret-at-least-32-chars''']
+
+[[allowlists]]
+description = ".env.example documents an empty JWT_SECRET placeholder; the match spans two lines"
+paths = ['''\.env\.example''']
+regexes = ['''JWT_SECRET=\s*JWT_TTL_MINUTES''']

@@ -65,6 +65,7 @@ public class CatalogController {
                     "SELECT id, name, price, description FROM products WHERE LOWER(name) LIKE ?", "%" + q.toLowerCase() + "%"));
         }
         // v1 VULNERABLE (F-06): SQL injection by string concatenation, database errors returned verbatim
+        // nosemgrep: java.spring.security.injection.tainted-sql-string.tainted-sql-string  -- intentional v1 finding F-06; v2 uses a bound parameter
         String sql = "SELECT id, name, price, description FROM products WHERE name LIKE '%" + q + "%'";
         try {
             return ResponseEntity.ok(Db.rows(jdbc, sql));
@@ -83,6 +84,7 @@ public class CatalogController {
         }
         // v1 VULNERABLE (F-07): the query is reflected into the page unescaped (reflected XSS),
         // and (F-06) concatenated into SQL.
+        // nosemgrep: java.spring.security.injection.tainted-sql-string.tainted-sql-string  -- intentional v1 finding F-06 (F-07 page); v2 uses a bound parameter
         String sql = "SELECT id, name, price FROM products WHERE name LIKE '%" + q + "%'";
         try {
             return Html.page("Search", "<p>Results for: " + q + "</p>" + list(Db.rows(jdbc, sql), false));

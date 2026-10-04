@@ -87,6 +87,7 @@ public class DataInitializer implements ApplicationRunner {
     /** v1 password storage: fast, unsalted MD5 (a finding on purpose). */
     public static String md5(String s) {
         try {
+            // nosemgrep: java.lang.security.audit.crypto.use-of-md5.use-of-md5  -- intentional v1 password storage (F-03); v2 uses BCrypt
             return HexFormat.of().formatHex(MessageDigest.getInstance("MD5").digest(s.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
