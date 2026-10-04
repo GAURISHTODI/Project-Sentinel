@@ -1,0 +1,30 @@
+{
+  "terraform_plan": {
+    "tool": "checkov terraform_plan (bridgecrew/checkov:latest)",
+    "resources_in_plan": 15,
+    "resources_evaluated": 0,
+    "verdict": "NOT EVALUATED",
+    "reason": "Checkov has no checks for the random, tls and local providers this module uses, so the plan gate passes without evaluating anything. Recorded so that nobody reads it as a pass."
+  },
+  "terraform_source": {
+    "tool": "checkov terraform",
+    "resources_evaluated": 0,
+    "verdict": "NOT EVALUATED",
+    "reason": "same as above"
+  },
+  "kubernetes": {
+    "tool": "checkov kubernetes (bridgecrew/checkov:latest)",
+    "resources_evaluated": 8,
+    "passed": 174,
+    "failed": 4,
+    "verdict": "PASS WITH ACCEPTED FINDINGS",
+    "accepted": [
+      "CKV_K8S_43 image digest: images are built locally and loaded into the cluster, so they have no registry digest",
+      "CKV_K8S_15 imagePullPolicy Always: with local-only images, Always would pull from a registry that does not hold them"
+    ]
+  },
+  "agent_secops_gate": {
+    "verdict": "NOT RUN",
+    "reason": "No such tool is available in this environment. Checkov was used in its place, and the gap is stated here."
+  }
+}

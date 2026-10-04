@@ -389,3 +389,23 @@
   append-only trigger made deletion impossible, the chain broke at row 15519 for good. The lab Postgres volume was
   removed and re-created with the owner's approval. Lab data (incidents and audit history) regenerates from the
   generator and attack scripts. Fixtures now write through `PgRepo.audit`, so they hash-chain correctly.
+
+## Terraform and Kubernetes (T22, partial)
+- **Terraform generates the secrets and dev CA, but it has not replaced the files in use.** `infra/terraform` creates the
+  Postgres, Redis and JWT secrets and the dev CA with its server certificate, using the `random`, `tls` and `local`
+  providers. It was planned and applied only to a scratch directory. The live secrets were not touched, so the running
+  stack still uses the files from `make_dev_ca.sh` and the earlier secret files. Applying it against the repo would
+  replace the Postgres password, which only takes effect on a new database volume.
+- **The Checkov gate on Terraform evaluated nothing.** Checkov has no checks for the `random`, `tls` or `local`
+  providers. Both the plan scan and the source scan reported zero resources. The verdict is recorded as
+  NOT EVALUATED in `results/ci/terraform-k8s-gate.json`, so it is not read as a pass.
+- **The "Agent SecOps" gate was not run.** No such tool is available here. Checkov stands in for it, and the gap is
+  recorded in the same file.
+- **Kubernetes manifests are checked but not deployed.** `infra/k8s/platform.yaml` has a namespace with a
+  restricted Pod Security label, default-deny NetworkPolicies, and hardened Deployments for the responder and
+  target-shop. Checkov evaluates 8 resources: 174 checks pass and 4 fail. The 4 failures are an image digest and an
+  Always pull policy. Both are accepted because the images are built locally and loaded into the cluster. No kind
+  cluster was created, because the kind binary is not installed here and the cluster would need more memory than
+  the 16 GB laptop can spare alongside the rest of the stack.
+- **The Terraform state files are kept out of git.** `.gitignore` covers `*.tfstate`, the `.terraform/` directory and
+  plan files, because plans and state include the generated secrets.
