@@ -68,7 +68,7 @@ jobs:
       - name: Checkov (Dockerfiles, compose, Terraform, Kubernetes)
         run: |
           pip install -q checkov==3.2.*
-          checkov -d . --framework dockerfile,docker_compose,terraform,kubernetes --quiet --compact --soft-fail-on CKV_DOCKER_2,CKV_DOCKER_3
+          checkov -d . --framework dockerfile,terraform,kubernetes,github_actions --quiet --compact --soft-fail-on CKV_DOCKER_2,CKV_DOCKER_3
 
   dependencies:
     runs-on: ubuntu-latest

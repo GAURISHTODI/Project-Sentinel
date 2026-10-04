@@ -50,15 +50,36 @@
     "fix": "spring-boot-starter-parent 3.3.5 to 3.5.14; spring-framework 6.2.19, jackson-bom 2.18.11, tomcat 10.1.59 (10.1.58 is not published on Maven Central); kafka 3.9.2 and lz4-java 1.8.1 for target-shop"
   },
   "not_yet_run_locally": [
-    "OWASP Dependency-Check",
-    "CodeQL",
-    "ZAP baseline against target-shop v2",
-    "Checkov"
+    "OWASP Dependency-Check (needs a multi-hour NVD download; runs in CI)",
+    "CodeQL (runs in GitHub CI only)"
   ],
   "ci_workflow_fixes": [
     "Trivy action reference 0.28.0 corrected to v0.28.0 (tag did not exist)",
     "images job packages the jars before docker build",
     "DAST job scans SHOP_VERSION=v2",
-    "all actions pinned to commit SHA"
-  ]
+    "all actions pinned to commit SHA",
+    "Checkov framework docker_compose is not valid in this Checkov version; replaced with github_actions"
+  ],
+  "zap_baseline_target_shop_v2": {
+    "pass": 61,
+    "warn_new": 0,
+    "fail_new": 0,
+    "note": "passive baseline; the active scan in lab/04 failed with a Docker container EOF and now exits non-zero instead of reporting success"
+  },
+  "checkov": {
+    "frameworks": [
+      "dockerfile",
+      "terraform",
+      "kubernetes",
+      "github_actions"
+    ],
+    "github_actions_failed": 0,
+    "dockerfile_passed": 120,
+    "dockerfile_failed_after_fix": 6,
+    "soft_failed": [
+      "CKV_DOCKER_2 (HEALTHCHECK)",
+      "CKV_DOCKER_3 (USER)"
+    ],
+    "fixed": "lab/tools/hydra base moved from kalilinux/kali-rolling (no dated tag exists) to debian:bookworm-slim, Hydra from Debian; CKV_DOCKER_7 cleared"
+  }
 }

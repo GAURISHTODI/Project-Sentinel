@@ -6,6 +6,16 @@ cd "$(dirname "$0")"
 source ./guard.sh
 export MSYS_NO_PATHCONV=1  # Windows Git Bash: stop docker volume paths (/out, /wordlists) being rewritten as C: paths
 
+command -v docker >/dev/null || { echo "[zap] docker is not on PATH; nothing was scanned" >&2; exit 1; }
+
+# ZAP exits 0 (pass), 1 (failures found) or 2 (warnings found). Any other code is a real error.
+zap_exit_ok() {
+  case "$1" in
+    0|1|2) return 0 ;;
+    *) echo "[zap] scanner failed with exit $1" >&2; exit "$1" ;;
+  esac
+}
+
 TARGET="${1:-http://172.30.0.11:8080}"
 require_lab_target "$TARGET"
 
@@ -19,7 +29,7 @@ docker run --rm --network lab -v "$(pwd)/../results/lab:/zap/wrk:rw" \
   -t "$TARGET" \
   -r "zap_baseline_${TS}.html" \
   -J "zap_baseline_${TS}.json" \
-  -I || true   # zap-baseline.py exits non-zero when it finds warnings; that is expected, not a script failure
+  -I && zap_exit_ok 0 || zap_exit_ok $?
 
 echo "[zap] baseline results written to results/lab/zap_baseline_${TS}.html"
 
@@ -29,6 +39,6 @@ docker run --rm --network lab -v "$(pwd)/../results/lab:/zap/wrk:rw" \
   -t "$TARGET" \
   -r "zap_full_${TS}.html" \
   -J "zap_full_${TS}.json" \
-  -I || true   # also exits non-zero on findings; expected
+  -I && zap_exit_ok 0 || zap_exit_ok $?
 
 echo "[zap] active-scan results written to results/lab/zap_full_${TS}.html"
