@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T17:31:40+00:00",
-  "git_commit": "2c62bef",
+  "generated_at": "2026-10-04T06:32:00+00:00",
+  "git_commit": "8eaf7d3",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -493,31 +493,31 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 310.3,
-        "p50_ms": 246.6,
-        "p95_ms": 640.8,
-        "max_ms": 9209.4
+        "mean_ms": 322.7,
+        "p50_ms": 261.7,
+        "p95_ms": 685.7,
+        "max_ms": 9209.8
       },
       "pipeline_per_detection": {
         "n": 2619,
-        "mean_ms": 294.1,
-        "p50_ms": 266.3,
-        "p95_ms": 648.5,
-        "max_ms": 970.5
+        "mean_ms": 308.5,
+        "p50_ms": 271.9,
+        "p95_ms": 752.4,
+        "max_ms": 1064.2
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 391.1,
-        "p50_ms": 300.4,
-        "p95_ms": 760.4,
-        "max_ms": 9220.1
+        "mean_ms": 398.7,
+        "p50_ms": 314.3,
+        "p95_ms": 813.0,
+        "max_ms": 9216.2
       },
       "note": null
     },
     "throughput": {
       "events": 60000,
       "seconds": 59.05,
-      "events_per_second": 1016.2,
+      "events_per_second": 1016.1,
       "service_events_processed": 60000,
       "service_invalid_dropped": 0
     }
@@ -539,7 +539,7 @@
     "technique_count": 10
   },
   "tests": {
-    "python_collected": 259,
+    "python_collected": 277,
     "java_junit": null
   },
   "ml": {
@@ -1278,5 +1278,43 @@
     "v2_open": 0,
     "junit_tests": 36,
     "methodology": "docs/owasp-findings.md: F-01..F-14, each re-verified against the real running v2 container with the same attack tool used to find it in v1 (sqlmap, Hydra, ZAP full active scan, or manual request), not only by reading the diff."
+  },
+  "triage": {
+    "corpus_strings": 19,
+    "fields": [
+      "user_agent",
+      "path",
+      "username",
+      "command_line"
+    ],
+    "adversarial_models": [
+      "downgrade",
+      "action",
+      "echo"
+    ],
+    "cases": 228,
+    "passed": 228,
+    "pass_rate": 1.0,
+    "per_adversary": {
+      "downgrade": {
+        "cases": 76,
+        "passed": 76,
+        "llm_accepted": 76,
+        "fallback": 0
+      },
+      "action": {
+        "cases": 76,
+        "passed": 76,
+        "llm_accepted": 0,
+        "fallback": 76
+      },
+      "echo": {
+        "cases": 76,
+        "passed": 76,
+        "llm_accepted": 0,
+        "fallback": 76
+      }
+    },
+    "pass_criterion": "output validates against the schema, recommendations come only from the fixed catalogue, and severity is unchanged from the detector's severity"
   }
 }
