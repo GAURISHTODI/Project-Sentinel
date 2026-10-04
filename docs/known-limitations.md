@@ -337,3 +337,30 @@
   intended daily limit. Persisting the counter is not done yet.
 - **Triage output is a suggestion.** Recommendations such as `block_source_ip_after_review` are text for an analyst.
   Nothing in the agent calls the responder, so no enforcement follows from a model reply.
+
+## CI security gates (T20)
+- **Measured locally, before and after (results/ci/summary.json):** gitleaks 3 to 0; Semgrep 85 findings and a parse
+  error to 0 and 0; Trivy HIGH and CRITICAL with a fix available, target-shop 38 to 0 and responder 35 to 0.
+  Each suppression is listed with its reason. The Semgrep suppressions are five annotated sites and six ignored paths.
+  Gitleaks has three allowlisted items.
+- **Two gates have not been run locally.** OWASP Dependency-Check needs a long NVD download, and CodeQL runs only in
+  GitHub's CI. Both are configured in `security.yml` but their counts are not measured.
+- **The ZAP baseline on target-shop v2 is passive only.** It reported 61 pass, 0 new failures, 0 new warnings. The
+  active scan in `lab/04_zap_baseline.sh` failed with a Docker container error (unexpected EOF) and now exits non-zero.
+- **Scans of the first images were stale.** The Dockerfiles copy `target/*.jar`, and `mvn test` does not rebuild it.
+  The Trivy results of the first pass describe the old jars. The workflow now packages the jars before the image job.
+- **Several CI defects would have failed on the first run.** The Trivy action tag `0.28.0` does not exist (it is
+  `v0.28.0`). The image job built images without packaging the jars. Checkov rejected the `docker_compose` framework.
+  The DAST job scanned v1 where the spec requires v2. All were corrected.
+- **Accepted Checkov findings.** HEALTHCHECK (CKV_DOCKER_2) and USER (CKV_DOCKER_3) are soft-failed. The tshark capture
+  image runs as root with NET_RAW and NET_ADMIN granted at run time, and it is lab-only. Compose health checks cover the
+  services that need them.
+- **Trivy analysis needed a longer timeout.** The default five-minute limit was too short for the layers, so the
+  scans used 40 minutes. Images were scanned from exported tarballs, because the Docker socket mount failed under Docker
+  Desktop.
+- **Spring Boot moved to 3.5.14, with pinned Spring, Jackson, Tomcat and Kafka versions.** Tomcat 10.1.58 is not on Maven
+  Central, so 10.1.59 is pinned. Both suites pass. The 3.4 line had no fix for one finding, so the upgrade was needed.
+- **Hydra lab image moved to a pinned Debian base.** `kalilinux/kali-rolling` only has a `latest` tag on Docker Hub. The
+  image builds and runs, but the lab attack script was not rerun against it.
+- **Action pins are SHAs.** The tags were resolved through the GitHub API at the time of writing. They will need
+  updating when the actions are upgraded.

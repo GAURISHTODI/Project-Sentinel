@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-04T06:32:00+00:00",
-  "git_commit": "8eaf7d3",
+  "generated_at": "2026-10-04T07:37:29+00:00",
+  "git_commit": "97013ab",
   "config": {
     "mode": "live",
     "eps": 1000,
@@ -493,31 +493,31 @@
     "latency": {
       "time_to_detect": {
         "n": 437,
-        "mean_ms": 322.7,
-        "p50_ms": 261.7,
-        "p95_ms": 685.7,
-        "max_ms": 9209.8
+        "mean_ms": 293.7,
+        "p50_ms": 229.5,
+        "p95_ms": 660.7,
+        "max_ms": 9205.7
       },
       "pipeline_per_detection": {
         "n": 2619,
-        "mean_ms": 308.5,
-        "p50_ms": 271.9,
-        "p95_ms": 752.4,
-        "max_ms": 1064.2
+        "mean_ms": 279.4,
+        "p50_ms": 240.6,
+        "p95_ms": 706.3,
+        "max_ms": 1032.8
       },
       "time_to_respond": {
         "n": 177,
-        "mean_ms": 398.7,
-        "p50_ms": 314.3,
-        "p95_ms": 813.0,
-        "max_ms": 9216.2
+        "mean_ms": 370.3,
+        "p50_ms": 264.2,
+        "p95_ms": 812.4,
+        "max_ms": 9212.2
       },
       "note": null
     },
     "throughput": {
       "events": 60000,
       "seconds": 59.05,
-      "events_per_second": 1016.1,
+      "events_per_second": 1016.2,
       "service_events_processed": 60000,
       "service_invalid_dropped": 0
     }
@@ -1278,6 +1278,91 @@
     "v2_open": 0,
     "junit_tests": 36,
     "methodology": "docs/owasp-findings.md: F-01..F-14, each re-verified against the real running v2 container with the same attack tool used to find it in v1 (sqlmap, Hydra, ZAP full active scan, or manual request), not only by reading the diff."
+  },
+  "ci": {
+    "measured_locally_with": {
+      "gitleaks": "zricethezav/gitleaks:latest (full history, with .gitleaks.toml)",
+      "semgrep": "semgrep/semgrep:1.90.0 with p/python p/java p/dockerfile p/owasp-top-ten",
+      "trivy": "aquasec/trivy:latest on saved images, HIGH and CRITICAL, --ignore-unfixed"
+    },
+    "gitleaks": {
+      "before": 3,
+      "after": 0,
+      "allowlisted_with_reason": 3
+    },
+    "semgrep": {
+      "before": {
+        "findings": 85,
+        "parse_errors": 1
+      },
+      "after": {
+        "findings": 0,
+        "parse_errors": 0
+      },
+      "suppressed": {
+        "nosemgrep_annotations": 5,
+        "ignored_paths": [
+          "results/",
+          "data/",
+          "**/target/",
+          "**/node_modules/",
+          "network/samples/",
+          "tests/test_api.py"
+        ]
+      }
+    },
+    "trivy": {
+      "target-shop": {
+        "before": 38,
+        "after": 0,
+        "severity_before": {
+          "HIGH": 31,
+          "CRITICAL": 7
+        }
+      },
+      "responder": {
+        "before": 35,
+        "after": 0,
+        "severity_before": {
+          "HIGH": 28,
+          "CRITICAL": 7
+        }
+      },
+      "fix": "spring-boot-starter-parent 3.3.5 to 3.5.14; spring-framework 6.2.19, jackson-bom 2.18.11, tomcat 10.1.59 (10.1.58 is not published on Maven Central); kafka 3.9.2 and lz4-java 1.8.1 for target-shop"
+    },
+    "not_yet_run_locally": [
+      "OWASP Dependency-Check (needs a multi-hour NVD download; runs in CI)",
+      "CodeQL (runs in GitHub CI only)"
+    ],
+    "ci_workflow_fixes": [
+      "Trivy action reference 0.28.0 corrected to v0.28.0 (tag did not exist)",
+      "images job packages the jars before docker build",
+      "DAST job scans SHOP_VERSION=v2",
+      "all actions pinned to commit SHA",
+      "Checkov framework docker_compose is not valid in this Checkov version; replaced with github_actions"
+    ],
+    "zap_baseline_target_shop_v2": {
+      "pass": 61,
+      "warn_new": 0,
+      "fail_new": 0,
+      "note": "passive baseline; the active scan in lab/04 failed with a Docker container EOF and now exits non-zero instead of reporting success"
+    },
+    "checkov": {
+      "frameworks": [
+        "dockerfile",
+        "terraform",
+        "kubernetes",
+        "github_actions"
+      ],
+      "github_actions_failed": 0,
+      "dockerfile_passed": 120,
+      "dockerfile_failed_after_fix": 6,
+      "soft_failed": [
+        "CKV_DOCKER_2 (HEALTHCHECK)",
+        "CKV_DOCKER_3 (USER)"
+      ],
+      "fixed": "lab/tools/hydra base moved from kalilinux/kali-rolling (no dated tag exists) to debian:bookworm-slim, Hydra from Debian; CKV_DOCKER_7 cleared"
+    }
   },
   "triage": {
     "corpus_strings": 19,
