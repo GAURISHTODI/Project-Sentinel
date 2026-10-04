@@ -50,3 +50,6 @@ results/network/suricata_out*/
 results/ci/gitleaks.json
 results/ci/semgrep.json
 results/ci/trivy-*.json
+results/ci/checkov.json
+results/lab/zap_*.html
+results/lab/zap_*.json
