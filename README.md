@@ -45,8 +45,8 @@ A feature is ticked only when its code, tests and a working demo exist.
 - [x] T18 Triage agent (schema-validated JSON, mock provider run live on stored incident 8030; the Gemini adapter is written and mocked in tests but not yet run against the real API)
 - [x] T19 Injection test suite (19 textbook payloads x 4 fields x 3 scripted model behaviours = 228 cases, pass rate 1.0; these are scripted adversaries, not a live model)
 - [x] T20 CI security gates (gitleaks 3 to 0, Semgrep 85 to 0, Trivy HIGH and CRITICAL 38 and 35 to 0 on both images, ZAP baseline on v2 clean; Dependency-Check and CodeQL are configured but not run locally)
-- [ ] T21 Platform security
-- [ ] T22 Terraform + Kubernetes (kind)
+- [ ] T21 Platform security (partial: least-privilege DB roles, append-only audit, Postgres TLS, Docker secrets, header tests; open: Kafka and Redis TLS, Vault, host-side .env)
+- [ ] T22 Terraform + Kubernetes (kind) (partial: Terraform validated and applied to a scratch root; Checkov gate on Terraform evaluated nothing; Kubernetes manifests checked, not deployed; no kind cluster)
 - [x] T23 Final evaluation (clean-tree live run regenerates metrics.json; figures in results/plots are drawn only from those measured results)
 - [x] T24 Documentation (architecture with diagram, STRIDE threat model, one playbook per rule plus ML and triage, writeup with measured results and limitations, demo script)
 
