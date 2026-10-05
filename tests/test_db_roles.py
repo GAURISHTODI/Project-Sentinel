@@ -40,6 +40,17 @@ def conn_for():  # type: ignore[no-untyped-def]
     return make
 
 
+def _owner_dsn() -> str:
+    import psycopg
+
+    url = get_settings().database_url.get_secret_value()
+    try:
+        psycopg.connect(url, connect_timeout=2).close()
+    except psycopg.OperationalError as exc:
+        pytest.skip(f"Postgres not reachable: {str(exc).splitlines()[0][:80]}")
+    return url
+
+
 def _denied(conn, sql: str, params: tuple = ()) -> bool:  # type: ignore[no-untyped-def]
     import psycopg
 
@@ -84,7 +95,7 @@ def test_api_role_can_change_only_incident_status(conn_for) -> None:  # type: ig
 def test_audit_log_trigger_blocks_update_and_delete_for_the_owner() -> None:
     import psycopg
 
-    with psycopg.connect(get_settings().database_url.get_secret_value(), autocommit=True) as conn:
+    with psycopg.connect(_owner_dsn(), autocommit=True) as conn:
         row = conn.execute("SELECT id FROM audit_log ORDER BY id DESC LIMIT 1").fetchone()
         if row is None:
             pytest.skip("audit_log is empty")
@@ -100,6 +111,7 @@ def test_service_dsn_logs_in_as_its_own_role(service: str) -> None:
 
     from sentinel.common.config import dsn_for
 
+    _owner_dsn()
     settings = get_settings()
     try:
         with psycopg.connect(dsn_for(settings, service), connect_timeout=2) as conn:  # type: ignore[arg-type]
@@ -112,7 +124,7 @@ def test_service_dsn_logs_in_as_its_own_role(service: str) -> None:
 def test_plaintext_connections_to_postgres_are_refused() -> None:
     import psycopg
 
-    url = get_settings().database_url.get_secret_value().split("?", 1)[0]
+    url = _owner_dsn().split("?", 1)[0]
     with pytest.raises(psycopg.OperationalError, match="pg_hba|SSL|ssl"):
         psycopg.connect(f"{url}?sslmode=disable", connect_timeout=3)
 
@@ -120,6 +132,6 @@ def test_plaintext_connections_to_postgres_are_refused() -> None:
 def test_verified_tls_session_is_used() -> None:
     import psycopg
 
-    with psycopg.connect(get_settings().database_url.get_secret_value()) as conn:
+    with psycopg.connect(_owner_dsn()) as conn:
         ssl_on = conn.execute("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()").fetchone()
     assert ssl_on is not None and ssl_on[0] is True
