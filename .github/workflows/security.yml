@@ -101,7 +101,9 @@ jobs:
       - name: Package jars the Dockerfiles copy
         run: mvn -q -B -DskipTests -f target-shop/pom.xml package && mvn -q -B -DskipTests -f responder/pom.xml package
       - name: Build images
-        run: docker compose --profile core build target-shop responder
+        run: |
+          cp .env.example .env
+          docker compose --profile core build target-shop responder
       - name: Save images for scanning
         run: |
           docker save sentinel/target-shop:1.0.0 -o "$RUNNER_TEMP/target-shop.tar"
