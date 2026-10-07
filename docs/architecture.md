@@ -61,7 +61,7 @@ the target trusts for forwarded client addresses.
 ## Security controls in place
 
 - Each service connects to PostgreSQL as its own least-privilege role. The evaluation harness keeps the owner.
-- PostgreSQL requires verified TLS for remote clients, using a dev CA. Kafka and Redis are not encrypted.
+- PostgreSQL and Redis require verified TLS, using a dev CA (the responder trusts it through a truststore built at start-up). Kafka is not encrypted.
 - Compose credentials are Docker secrets for Postgres, Redis and the responder. Host-side processes still read `.env`.
 - Every API response carries nosniff, DENY framing, no-store, no-referrer and a restrictive CSP.
 - Log content is treated as untrusted everywhere: at ingest, in rules, in ML inputs, in the triage prompt, and in dashboards.

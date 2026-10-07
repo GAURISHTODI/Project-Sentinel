@@ -19,7 +19,7 @@ class JwtVerifierTest {
 
     static GatewayProperties props(String secret) {
         return new GatewayProperties("http://x", secret, "sentinel", 300, true, 1024, 1024, 1000,
-                List.of("/admin"), new GatewayProperties.Redis("r", 6379, "", 100));
+                List.of("/admin"), new GatewayProperties.Redis("r", 6379, "", 100, false));
     }
 
     @BeforeEach

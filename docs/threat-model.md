@@ -70,7 +70,7 @@ from untrusted clients and are never trusted.
 | Threat | Example | Control | Status |
 |---|---|---|---|
 | Spoofing | Rogue database server | Postgres clients verify the server certificate against the dev CA | partial (dev CA only) |
-| Information disclosure | Sniffing traffic | Postgres: TLS only from remote clients. Kafka and Redis: plaintext on internal networks | partial |
+| Information disclosure | Sniffing traffic | Postgres and Redis: TLS only, with verified certificates. Kafka: plaintext on internal networks | partial |
 | Tampering | Changing rows directly | Least-privilege roles per service; the owner is used only by the evaluation harness | partial (the owner still exists and is powerful) |
 | Information disclosure | Credentials in git or images | Compose secrets are files under a gitignored directory; gitleaks runs in CI with reviewed allowlist entries | partial (host processes still read `.env`) |
 
@@ -98,7 +98,7 @@ has a v2 fix that is re-verified against the live container. v1 is never exposed
 
 1. The database owner is powerful and is still used by the evaluation harness.
 2. Host-side processes read credentials from `.env`.
-3. Kafka and Redis traffic is unencrypted on the internal networks.
+3. Kafka traffic is unencrypted on the internal networks.
 4. Rules and models can be evaded by an adversary who knows the thresholds.
 5. A mis-tuned rule can block a real user. Only loopback and link-local ranges are protected by policy, so
    every customer address range would need to be listed before blocks are enabled on real traffic.

@@ -409,3 +409,12 @@
   the 16 GB laptop can spare alongside the rest of the stack.
 - **The Terraform state files are kept out of git.** `.gitignore` covers `*.tfstate`, the `.terraform/` directory and
   plan files, because plans and state include the generated secrets.
+
+## Redis TLS (T21)
+- Redis serves TLS only (`--port 0 --tls-port 6379`, no plaintext listener). Its certificate is issued by the dev CA
+  for `redis`, `localhost` and 127.0.0.1. Clients verify it: the responder through a PKCS12 truststore built from the
+  CA at start-up, and the Python services through `rediss://` with `ssl_cert_reqs=required`.
+- The responder image had to be rebuilt after the Java TLS change. An earlier build silently connected in plaintext
+  and every decision fell back to fail-open. The image build is part of the verification now.
+- The host's native Windows PostgreSQL service listens on 5432, so the compose Postgres container runs on 5433 in
+  the gitignored `.env`. The Windows service was not stopped, because it may belong to another project.

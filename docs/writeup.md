@@ -78,7 +78,7 @@ These are the main ones. The full list, with the reasons, is in `docs/known-limi
   stays within the thresholds, or uses a technique with no rule, is not detected.
 - **Several security gates have not run.** Dependency-Check and CodeQL are configured but not run locally. The
   Terraform gate evaluated nothing, because Checkov has no checks for the providers used.
-- **Security controls are partial.** Postgres uses verified TLS; Kafka and Redis are plaintext on internal networks.
+- **Security controls are partial.** Postgres and Redis use verified TLS; Kafka is plaintext on internal networks.
   Credentials are Docker secrets for the containers, but the host-side processes still read `.env`.
 - **The audit chain was reset once.** Test fixtures had written unhashed rows, and the append-only trigger made that
   unfixable in place. The lab database was re-created with the owner's approval. This is recorded in the known

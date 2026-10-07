@@ -27,5 +27,7 @@ public record GatewayProperties(
             @DefaultValue("redis") String host,
             @DefaultValue("6379") int port,
             @DefaultValue("") String password,
-            @DefaultValue("200") int timeoutMs) {}
+            @DefaultValue("200") int timeoutMs,
+            /** Connect with TLS and verify the server against the JVM truststore. */
+            @DefaultValue("false") boolean tls) {}
 }

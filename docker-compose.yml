@@ -87,13 +87,17 @@ services:
     environment:
       GATEWAY_UPSTREAM: http://172.30.0.11:8080
       GATEWAY_REDIS_HOST: redis
+      GATEWAY_REDIS_PORT: "6379"
+      GATEWAY_REDIS_TLS: "true"
       GATEWAY_RATE_LIMIT: ${GATEWAY_RATE_LIMIT:-300}
       JAVA_TOOL_OPTIONS: "-Xms64m -Xmx256m"
     secrets: [jwt_secret, redis_password]
+    volumes:
+      - ./infra/tls:/tls:ro
     entrypoint:
       - sh
       - -c
-      - export GATEWAY_JWT_SECRET="$$(cat /run/secrets/jwt_secret)" GATEWAY_REDIS_PASSWORD="$$(cat /run/secrets/redis_password)"; exec java -jar /app/app.jar
+      - export GATEWAY_JWT_SECRET="$$(cat /run/secrets/jwt_secret)" GATEWAY_REDIS_PASSWORD="$$(cat /run/secrets/redis_password)"; keytool -importcert -noprompt -alias sentinel-dev-ca -file /tls/ca.crt -keystore /tmp/truststore.p12 -storetype PKCS12 -storepass changeit >/dev/null 2>&1; exec java -Djavax.net.ssl.trustStore=/tmp/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -jar /app/app.jar
     depends_on:
       redis:
         condition: service_healthy
@@ -145,13 +149,14 @@ services:
     profiles: ["core"]
     networks: [backend, edge]
     secrets: [redis_password]
-    command: ["sh", "-c", "exec redis-server --requirepass \"$$(cat /run/secrets/redis_password)\" --maxmemory 256mb --maxmemory-policy volatile-lru --appendonly no"]
+    command: ["sh", "-c", "exec redis-server --port 0 --tls-port 6379 --tls-cert-file /tls/redis.crt --tls-key-file /tls/redis.key --tls-ca-cert-file /tls/ca.crt --tls-auth-clients no --requirepass \"$$(cat /run/secrets/redis_password)\" --maxmemory 256mb --maxmemory-policy volatile-lru --appendonly no"]
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis-data:/data
+      - ./infra/tls:/tls:ro
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$$(cat /run/secrets/redis_password)\" --no-auth-warning ping | grep -q PONG"]
+      test: ["CMD-SHELL", "redis-cli --tls --cacert /tls/ca.crt -p 6379 -a \"$$(cat /run/secrets/redis_password)\" --no-auth-warning ping | grep -q PONG"]
       interval: 5s
       timeout: 3s
       retries: 10

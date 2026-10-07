@@ -26,7 +26,7 @@ public class RedisGatewayStore implements GatewayStore {
         cfg.setMaxIdle(8);
         cfg.setTestOnBorrow(false);
         String password = r.password().isBlank() ? null : r.password();
-        this.pool = new JedisPool(cfg, r.host(), r.port(), r.timeoutMs(), password);
+        this.pool = new JedisPool(cfg, r.host(), r.port(), r.timeoutMs(), password, r.tls());
     }
 
     @Override

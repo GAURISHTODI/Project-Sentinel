@@ -16,5 +16,13 @@ if [ ! -f server.key ]; then
     -out server.crt -days 825 -extfile server.ext
   rm -f server.csr server.ext ca.srl
 fi
+if [ ! -f redis.key ]; then
+  openssl req -newkey rsa:2048 -nodes -keyout redis.key -out redis.csr -subj "/CN=redis"
+  printf "subjectAltName=DNS:redis,DNS:localhost,IP:127.0.0.1
+extendedKeyUsage=serverAuth
+" > redis.ext
+  openssl x509 -req -in redis.csr -CA ca.crt -CAkey ca.key -CAcreateserial     -out redis.crt -days 825 -extfile redis.ext
+  rm -f redis.csr redis.ext ca.srl
+fi
 chmod 600 ./*.key
-echo "dev CA: $(pwd)/ca.crt"
+echo "dev CA: $(pwd)/ca.crt (Postgres and Redis server certificates issued)"
