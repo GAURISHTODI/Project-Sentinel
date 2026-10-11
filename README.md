@@ -22,7 +22,6 @@ Sentinel ingests logs from four sources, detects attacks with ATT&CK-mapped rule
 | **DevSecOps** | Scanners in CI TBD, test count TBD |
 
 ## Status
-
 A feature is ticked only when its code, tests and a working demo exist.
 
 - [x] T1 Scaffold + infra (Kafka KRaft, Redis, PostgreSQL, compose profiles)
@@ -111,7 +110,6 @@ Five actions run through a YAML response policy, and each is idempotent and audi
 5. Alerting via Slack/Teams webhook
 
 The Spring Boot gateway enforces the blocklist (HTTP 403), rate limits, and JWT/RBAC on admin routes.
-
 ### Attack lab and vulnerability assessment
 `target-shop` v1 is a deliberately vulnerable e-commerce app covering SQL injection, reflected and stored XSS, IDOR, weak authentication, missing rate limiting, and security misconfiguration. The lab attacks it with Nmap, sqlmap, Hydra and OWASP ZAP, with manual testing in Burp Suite, and captures traffic with Wireshark/tshark for pcap validation. All findings will be documented in `docs/owasp-findings.md` with the Sentinel detection that fired, then closed in `target-shop` v2 and re-tested.
 
@@ -218,7 +216,6 @@ bash lab/run_attacks.sh        # lab-only, guarded
 ```
 
 Requirements: Docker with Compose v2, Python 3.11+, Java 21, Maven. About 10 GB of RAM allocated to Docker is enough for the core profile.
-
 ## Repository layout
 
 ```
